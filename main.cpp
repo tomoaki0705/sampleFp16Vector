@@ -30,7 +30,7 @@ int main()
 	{
 		if ((i & 7) == 0)
 		{
-			std::cout << std::dec << std::setfill(' ') << std::setw(4) << i;
+			std::cout << std::dec << std::setfill(' ') << std::setw(5) << i;
 		}
 		std::cout  << " 0x" << std::hex << gain[i];
 		if ((i & 7) == 7)

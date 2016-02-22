@@ -8,7 +8,7 @@ extern "C"
 #include <stdlib.h>
 }
 #define alignedMalloc(size,align)	_aligned_malloc(size,align)
-#else
+#elif defined (__GNUC__)
 #define alignedMalloc(size,align)	memalign(align,size)
 #endif
 

@@ -12,16 +12,10 @@ extern "C"
 #endif
 #include "floatMul.h"
 
-const int ALIGN=32; // alignment step for SSE
+const int ALIGN   = 32; // alignment step for SSE
 const int cWidth  = 256;
 const int cHeight = cWidth;
 const int cSize   = cHeight * cWidth;
-
-void float2half(float* floats, short* halfs) {
-	__m256 float_vector = _mm256_load_ps(floats);
-	__m128i half_vector = _mm256_cvtps_ph(float_vector, 0);
-	*(__m128i*)halfs = half_vector;
-}
 
 int main()
 {

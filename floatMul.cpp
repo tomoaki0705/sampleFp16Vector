@@ -1,6 +1,12 @@
 #include <immintrin.h>
 #include "floatMul.h"
 
+void float2half(float* floats, short* halfs) {
+	__m256 float_vector = _mm256_load_ps(floats);
+	__m128i half_vector = _mm256_cvtps_ph(float_vector, 0);
+	*(__m128i*)halfs = half_vector;
+}
+
 void multiply(unsigned char* src, short* gain, unsigned char* dst, unsigned int cSize)
 {
 	__m128i v_zero = _mm_setzero_si128();

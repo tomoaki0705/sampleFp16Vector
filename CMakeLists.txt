@@ -11,4 +11,4 @@ if(WIN32)
 	set(CMAKE_CXX_FLAGS "/arch:AVX /EHsc")
 endif(WIN32)
 
-add_executable(sampleFp16x86 main.cpp)
+add_executable(sampleFp16x86 main.cpp floatMul.cpp)

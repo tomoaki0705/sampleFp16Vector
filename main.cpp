@@ -1,4 +1,3 @@
-#include <immintrin.h>
 #include <iostream>
 #include <iomanip>
 #include <malloc.h>

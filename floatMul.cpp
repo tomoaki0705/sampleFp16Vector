@@ -1,4 +1,9 @@
+
+#if defined(__arm__) || defined(_M_ARM)
+#include <arm_neon.h>
+#elif defined(__x86_64__) || defined(_M_X64)
 #include <immintrin.h>
+#endif
 #include "floatMul.h"
 
 void float2half(float* floats, short* halfs) {

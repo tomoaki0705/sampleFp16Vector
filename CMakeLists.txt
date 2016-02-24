@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(sampleFp16x86)
+project(sampleFp16)
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm.*|ARM.*)")
 	set(ARM 1)
@@ -9,15 +9,17 @@ else()
 endif()
 
 if (X86)
+	message(STATUS "detected x86 architecture")
 	if (UNIX)
 		set(CMAKE_CXX_FLAGS "-mavx -mf16c")
 	elseif (WIN32)
 		set(CMAKE_CXX_FLAGS "/arch:AVX /EHsc")
 	endif()
 elseif (ARM)
+	message(STATUS "detected ARM architecture")
 	if (UNIX)
 		set(CMAKE_CXX_FLAGS "-mfp16-format=ieee")
 	endif()
 endif()
 
-add_executable(sampleFp16x86 main.cpp floatMul.cpp)
+add_executable(sampleFp16 main.cpp floatMul.cpp)

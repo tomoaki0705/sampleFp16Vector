@@ -17,12 +17,32 @@ const int cWidth  = 256;
 const int cHeight = cWidth;
 const int cSize   = cHeight * cWidth;
 
+bool examineTest(unsigned char *result, unsigned char *result_examine, int cSize)
+{
+	bool flag = true;
+	int i = 0;
+	for (i = 0;i < cSize;i++)
+	{
+		if (result[i] != result_examine[i])
+		{
+			flag = false;
+			break;
+		}
+	}
+	if (flag == false)
+	{
+		std::cout << "Failed on " << i << " expected:" << result_examine[i] << " actual:" << result[i] << std::endl;
+	}
+	return flag;
+}
+
 int main()
 {
 	unsigned char* image =reinterpret_cast<unsigned char*>(alignedMalloc(cSize,ALIGN));
 	short* gain  =reinterpret_cast<short*>(alignedMalloc(cSize*2,ALIGN));
 	float* gainOriginal = reinterpret_cast<float*>(alignedMalloc(cSize*4,ALIGN));
 	unsigned char* result =reinterpret_cast<unsigned char*>(alignedMalloc(cSize,ALIGN));
+	unsigned char* result_examine =reinterpret_cast<unsigned char*>(alignedMalloc(cSize,ALIGN));
 	for (unsigned int i = 0;i < cSize;i++)
 	{
 		gainOriginal[i] = 1.0f;
@@ -30,13 +50,7 @@ int main()
 	}
 	float2half(gainOriginal, gain, cSize);
 	multiply(image, gain, result, cSize);
-	for(unsigned int i = 0;i < cSize;i++)
-	{
-		std::cout << (int)image[i] << ' ' << (int)result[i] << ' ';
-		if((i & 7) == 7)
-		{
-			std::cout << std::endl;
-		}
-	}
+	multiply_float(image, gainOriginal, result_examine, cSize);
+	examineTest(result, result_examine, cSize);
 	return 0;
 }

@@ -8,7 +8,7 @@ else()
 	set(X86 1)
 endif()
 
-if (x86)
+if (X86)
 	if (UNIX)
 		set(CMAKE_CXX_FLAGS "-mavx -mf16c")
 	elseif (WIN32)

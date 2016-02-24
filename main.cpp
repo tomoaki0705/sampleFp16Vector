@@ -28,10 +28,7 @@ int main()
 		gainOriginal[i] = 1.0f;
 		image[i] = (i & 255);
 	}
-	for(unsigned int i = 0;i < cSize/8;i++)
-	{
-		float2half(&gainOriginal[i*8], &gain[i*8]);
-	}
+	float2half(gainOriginal, gain, cSize);
 	multiply(image, gain, result, cSize);
 	for(unsigned int i = 0;i < cSize;i++)
 	{

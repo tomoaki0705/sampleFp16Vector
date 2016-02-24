@@ -6,10 +6,16 @@
 #endif
 #include "floatMul.h"
 
-void float2half(float* floats, short* halfs) {
-	__m256 float_vector = _mm256_load_ps(floats);
-	__m128i half_vector = _mm256_cvtps_ph(float_vector, 0);
-	*(__m128i*)halfs = half_vector;
+// requires AVX
+void float2half(float* src, short* dst, int length) {
+	const unsigned int cParallel = 8;
+	for (int i = 0; i < length-(cParallel-1); i+=cParallel)
+	{
+		__m256 float_vector = _mm256_load_ps(src + i);
+		__m128i half_vector = _mm256_cvtps_ph(float_vector, 0);
+		*(__m128i*)(dst + i) = half_vector;
+	}
+
 }
 
 void multiply(unsigned char* src, short* gain, unsigned char* dst, unsigned int cSize)

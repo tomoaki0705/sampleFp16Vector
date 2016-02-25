@@ -18,7 +18,7 @@ if (X86)
 elseif (ARM)
 	message(STATUS "detected ARM architecture")
 	if (UNIX)
-		set(CMAKE_CXX_FLAGS "-mfp16-format=ieee")
+		set(CMAKE_CXX_FLAGS "-mfp16-format=ieee -mfpu=neon-fp16 -flax-vector-conversions")
 	endif()
 endif()
 

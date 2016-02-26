@@ -5,28 +5,16 @@
 #include <immintrin.h>
 #endif
 #include "floatMul.h"
+#include "simdUtils.h"
 
 void float2half(float* src, short* dst, int length) {
-#if defined(__arm__) || defined(_M_ARM)
-	// requires NEON
 	const unsigned int cParallel = 4;
 	for (int i = 0; i <= length-cParallel; i+=cParallel)
 	{
-		float32x4_t float_vector = *(float32x4_t*)(src + i);
-		float16x4_t half_vector = vcvt_f16_f32( float_vector );
-		*(float16x4_t*)(dst + i) = half_vector;
+		float4 float_vector = load_float4(src + i);
+		half4  half_vector  = convert_float4_half4(float_vector);
+		store_half4(dst + i, half_vector);
 	}
-#elif defined(__x86_64__) || defined(_M_X64) || defined(_M_IX86)
-	// requires AVX
-	const unsigned int cParallel = 8;
-	for (int i = 0; i <= length-cParallel; i+=cParallel)
-	{
-		__m256 float_vector = _mm256_load_ps(src + i);
-		__m128i half_vector = _mm256_cvtps_ph(float_vector, 0);
-		*(__m128i*)(dst + i) = half_vector;
-	}
-#endif
-
 }
 
 void multiply_float(unsigned char* src, float* gain, unsigned char* dst, unsigned int cSize)

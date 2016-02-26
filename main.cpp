@@ -51,6 +51,13 @@ int main()
 	float2half(gainOriginal, gain, cSize);
 	multiply(image, gain, result, cSize);
 	multiply_float(image, gainOriginal, result_examine, cSize);
-	examineTest(result, result_examine, cSize);
-	return 0;
+	if (examineTest(result, result_examine, cSize))
+	{
+		std::cout << "test passed" << std::endl;
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
 }

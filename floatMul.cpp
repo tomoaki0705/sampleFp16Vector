@@ -55,13 +55,13 @@ void multiply(unsigned char* src, short* gain, unsigned char* dst, unsigned int 
 		uint32x4_t srcIntegerLow  = vmovl_u16(vget_low_s16 (srcIntegerShort));
 		uint32x4_t srcIntegerHigh = vmovl_u16(vget_high_s16(srcIntegerShort));
 
-		// half -> float
-		float32x4_t gainFloatLow  = vcvt_f32_f16(gainHalfLow );
-		float32x4_t gainFloatHigh = vcvt_f32_f16(gainHalfHigh);
-
 		// uint -> float
 		float32x4_t srcFloatLow  = vcvtq_f32_u32(srcIntegerLow );
 		float32x4_t srcFloatHigh = vcvtq_f32_u32(srcIntegerHigh);
+
+		// half -> float
+		float32x4_t gainFloatLow  = vcvt_f32_f16(gainHalfLow );
+		float32x4_t gainFloatHigh = vcvt_f32_f16(gainHalfHigh);
 
 		// float * float (per elment)
 		float32x4_t dstFloatLow  = vmulq_f32(srcFloatLow,  gainFloatLow );
@@ -76,6 +76,8 @@ void multiply(unsigned char* src, short* gain, unsigned char* dst, unsigned int 
 
 		// ushort -> uchar
 		uint8x8_t dstInteger = vmovn_u16(dstIntegerShort);
+
+		// store
 		vst1_u8(dst+x, dstInteger);
 	}
 #elif defined(__x86_64__) || defined(_M_X64) || defined(_M_IX86)

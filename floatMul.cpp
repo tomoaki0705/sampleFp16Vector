@@ -47,8 +47,8 @@ void multiply(unsigned char* src, short* gain, unsigned char* dst, unsigned int 
 		float4 gainFloatHigh = convert_half4_float4(gainHalfHigh);
 
 		// float * float (per elment)
-		float4 dstFloatLow  = srcFloatLow  * gainFloatLow;
-		float4 dstFloatHigh = srcFloatHigh * gainFloatHigh;
+		float4 dstFloatLow  = multiply_float4(srcFloatLow , gainFloatLow );
+		float4 dstFloatHigh = multiply_float4(srcFloatHigh, gainFloatHigh);
 
 		// float -> uint
 		uint4 dstIntegerLow  = convert_float4_uint4(dstFloatLow );

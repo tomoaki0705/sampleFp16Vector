@@ -2,9 +2,9 @@
 #include "floatMul.h"
 #include "simdUtils.h"
 
-void float2half(float* src, short* dst, int length) {
+void float2half(float* src, short* dst, unsigned int length) {
 	const unsigned int cParallel = 4;
-	for (int i = 0; i <= length-cParallel; i+=cParallel)
+	for (unsigned int i = 0; i <= length-cParallel; i+=cParallel)
 	{
 		float4 float_vector = load_float4(src + i);
 		half4  half_vector  = convert_float4_half4(float_vector);
@@ -14,7 +14,7 @@ void float2half(float* src, short* dst, int length) {
 
 void multiply_float(unsigned char* src, float* gain, unsigned char* dst, unsigned int cSize)
 {
-	for (int i = 0;i < cSize;i++)
+	for (unsigned int i = 0;i < cSize;i++)
 	{
 		dst[i] = (unsigned char)(src[i] * gain[i]);
 	}
@@ -23,7 +23,7 @@ void multiply_float(unsigned char* src, float* gain, unsigned char* dst, unsigne
 void multiply(unsigned char* src, short* gain, unsigned char* dst, unsigned int cSize)
 {
 	const unsigned int cParallel = 8;
-	for (int x = 0;x <= cSize - cParallel;x += cParallel)
+	for (unsigned int x = 0;x <= cSize - cParallel;x += cParallel)
 	{
 		// load 64bits
 		uchar8 srcInteger = load_uchar8(src+x);

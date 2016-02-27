@@ -1,6 +1,20 @@
 
 #include "floatMul.h"
 #include "simdUtils.h"
+#include <intrin.h>
+
+bool hasF16cSupport()
+{
+	bool hasSupport = false;
+	int cpuFeature[4];
+	__cpuid(cpuFeature, 0);
+	if (cpuFeature[0] >= 1)
+	{
+		__cpuidex(cpuFeature, 1, 0);
+		hasSupport = cpuFeature[2] & (1 << 29) ? true : false;
+	}
+	return hasSupport;
+}
 
 void float2half(float* src, short* dst, unsigned int length) {
 	const unsigned int cParallel = 4;

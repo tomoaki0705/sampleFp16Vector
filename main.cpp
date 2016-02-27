@@ -38,6 +38,12 @@ bool examineTest(unsigned char *result, unsigned char *result_examine, int cSize
 
 int main()
 {
+	if (hasF16cSupport() == false)
+	{
+		std::cerr << "Processor has no fp16 support" << std::endl;
+		return 1;
+	}
+
 	unsigned char* image =reinterpret_cast<unsigned char*>(alignedMalloc(cSize,ALIGN));
 	short* gain  =reinterpret_cast<short*>(alignedMalloc(cSize*2,ALIGN));
 	float* gainOriginal = reinterpret_cast<float*>(alignedMalloc(cSize*4,ALIGN));

@@ -43,6 +43,11 @@ inline float4 convert_half4_float4(half4 h) { return _mm_cvtph_ps(h); }
 inline uint4 convert_float4_uint4(float4 f) { return _mm_cvtps_epi32(f); }
 inline ushort8 convert_uint4_ushort8(uint4 a, uint4 b){ return _mm_packs_epi32(a, b); }
 inline float4 multiply_float4(float4 a, float4 b)     { return _mm_mul_ps(a, b); }
+#ifdef _MSC_VER
+#include <intrin.h>
+#elif defined (__GNUC__)
+#include <cpuid.h>
+#endif
 #endif
 
 

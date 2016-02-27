@@ -1,16 +1,25 @@
 
 #include "floatMul.h"
 #include "simdUtils.h"
-#include <intrin.h>
 
 bool hasF16cSupport()
 {
 	bool hasSupport = false;
+
+#ifdef _MSC_VER
 	int cpuFeature[4];
 	__cpuid(cpuFeature, 0);
+#elif defined (__GNUC__)
+	unsigned int cpuFeature[4];
+	__get_cpuid_max (0, cpuFeature);
+#endif
 	if (cpuFeature[0] >= 1)
 	{
+#ifdef _MSC_VER
 		__cpuidex(cpuFeature, 1, 0);
+#elif defined (__GNUC__)
+		__get_cpuid (1, &cpuFeature[0], &cpuFeature[1], &cpuFeature[2], &cpuFeature[3]);
+#endif
 		hasSupport = cpuFeature[2] & (1 << 29) ? true : false;
 	}
 	return hasSupport;

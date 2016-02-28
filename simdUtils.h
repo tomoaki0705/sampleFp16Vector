@@ -21,7 +21,7 @@ inline float4 convert_half4_float4(half4 h) { return vcvt_f32_f16(h); }
 inline uint4 convert_float4_uint4(float4 f) { return vcvtq_u32_f32(f); }
 inline ushort8 convert_uint4_ushort8(uint4 a, uint4 b){ return vcombine_u16(vmovn_u16(a), vmovn_u16(b)); }
 inline float4 multiply_float4(float4 a, float4 b)     { return vmulq_f32(a, b); }
-#elif defined(__x86_64__) || defined(_M_X64) || defined(_M_IX86)
+#elif defined(__x86_64__) || defined(_M_X64) || defined(_M_IX86) || defined(i386)
 #include <immintrin.h>
 typedef __m128 float4;
 typedef __m128i half4;

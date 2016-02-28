@@ -10,7 +10,7 @@ inline float4 load_float4(const float* ptr) { return *(float4*)ptr; }
 inline half4 load_half4(const short* ptr)   { return *(float16x4_t*)ptr; }
 inline uchar8 load_uchar8(const unsigned char* ptr) { return vld1_u8(ptr); }
 inline void store_half4(void* ptr, half4 h) { *(half4*)ptr = h; }
-inline void store_uchar8(void* ptr, uchar8 c)   { vst1_u8(ptr, c); }
+inline void store_uchar8(void* ptr, uchar8 c)   { vst1_u8((unsigned char*)ptr, c); }
 inline half4 convert_float4_half4(float4 f) { return vcvt_f16_f32(f); }
 inline ushort8 convert_uchar8_ushort8(uchar8 c) { return vmovl_u8(c); }
 inline uint4 convert_ushort8_lo_uint4(ushort8 s){ return vmovl_u16(vget_low_s16 (s)); }

@@ -13,8 +13,8 @@ inline void store_half4(void* ptr, half4 h) { *(half4*)ptr = h; }
 inline void store_uchar8(void* ptr, uchar8 c)   { vst1_u8(ptr, c); }
 inline half4 convert_float4_half4(float4 f) { return vcvt_f16_f32(f); }
 inline ushort8 convert_uchar8_ushort8(uchar8 c) { return vmovl_u8(c); }
-inline uint4 convert_ushort8_lo_uint4(ushort8 s){ return vmovl_u16(vget_low_s16 (s); }
-inline uint4 convert_ushort8_hi_uint4(ushort8 s){ return vmovl_u16(vget_high_s16(s); }
+inline uint4 convert_ushort8_lo_uint4(ushort8 s){ return vmovl_u16(vget_low_s16 (s)); }
+inline uint4 convert_ushort8_hi_uint4(ushort8 s){ return vmovl_u16(vget_high_s16(s)); }
 inline uchar8 convert_ushort8_uchar8(ushort8 s) { return vmovn_u16(s); }
 inline float4 convert_uint4_float4(uint4 i) { return vcvtq_f32_u32(i); }
 inline float4 convert_half4_float4(half4 h) { return vcvt_f32_f16(h); }

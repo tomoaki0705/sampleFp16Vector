@@ -44,11 +44,13 @@ bool checkFeatureSupport()
 		std::cerr << "Processor has no fp16 support" << std::endl;
 		hasEnoughSupport = false;
 	}
+#if defined(__x86_64__) || defined(_M_X64) || defined(_M_IX86) || defined(i386)
 	if (hasSse41Support() == false)
 	{
 		std::cerr << "Processor has no SSE4.1 support" << std::endl;
 		hasEnoughSupport = false;
 	}
+#endif
 	return hasEnoughSupport;
 }
 

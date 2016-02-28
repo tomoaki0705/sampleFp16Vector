@@ -10,16 +10,17 @@ endif()
 
 if (X86)
 	message(STATUS "detected x86 architecture")
+	set (FEATURESUPPORT featureSupportX86.cpp)
 	if (UNIX)
 		set(CMAKE_CXX_FLAGS "-mf16c")
 	endif()
 elseif (ARM)
 	message(STATUS "detected ARM architecture")
+	set (FEATURESUPPORT featureSupportARM.cpp)
 	if (UNIX)
 		set(CMAKE_CXX_FLAGS "-mfp16-format=ieee -mfpu=neon-fp16 -flax-vector-conversions")
 	endif()
 endif()
 
-set (FEATURESUPPORT featureSupportX86.cpp)
 
 add_executable(sampleFp16 main.cpp floatMul.cpp ${FEATURESUPPORT})

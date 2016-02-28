@@ -20,4 +20,6 @@ elseif (ARM)
 	endif()
 endif()
 
-add_executable(sampleFp16 main.cpp floatMul.cpp)
+set (FEATURESUPPORT featureSupportX86.cpp)
+
+add_executable(sampleFp16 main.cpp floatMul.cpp ${FEATURESUPPORT})

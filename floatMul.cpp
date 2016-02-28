@@ -2,10 +2,8 @@
 #include "floatMul.h"
 #include "simdUtils.h"
 
-bool hasF16cSupport()
+int getCpuIdMax()
 {
-	bool hasSupport = false;
-
 #ifdef _MSC_VER
 	int cpuFeature[4];
 	__cpuid(cpuFeature, 0);
@@ -13,14 +11,39 @@ bool hasF16cSupport()
 	unsigned int cpuFeature[4];
 	__get_cpuid_max (0, cpuFeature);
 #endif
-	if (cpuFeature[0] >= 1)
-	{
+	return (int)cpuFeature[0];
+}
+
+unsigned int getFeatureEcx()
+{
 #ifdef _MSC_VER
-		__cpuidex(cpuFeature, 1, 0);
+	int cpuFeature[4];
+	__cpuidex(cpuFeature, 1, 0);
 #elif defined (__GNUC__)
-		__get_cpuid (1, &cpuFeature[0], &cpuFeature[1], &cpuFeature[2], &cpuFeature[3]);
+	unsigned int cpuFeature[4];
+	__get_cpuid (1, &cpuFeature[0], &cpuFeature[1], &cpuFeature[2], &cpuFeature[3]);
 #endif
-		hasSupport = cpuFeature[2] & (1 << 29) ? true : false;
+	return (unsigned int)cpuFeature[2];
+}
+
+bool hasSse41Support()
+{
+	bool hasSupport = false;
+
+	if (getCpuIdMax() >= 1)
+	{
+		hasSupport = getFeatureEcx() & (1 << 19) ? true : false;
+	}
+	return hasSupport;
+}
+
+bool hasF16cSupport()
+{
+	bool hasSupport = false;
+
+	if (getCpuIdMax() >= 1)
+	{
+		hasSupport = getFeatureEcx() & (1 << 29) ? true : false;
 	}
 	return hasSupport;
 }

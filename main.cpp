@@ -36,14 +36,28 @@ bool examineTest(unsigned char *result, unsigned char *result_examine, int cSize
 	return flag;
 }
 
-int main()
+bool checkFeatureSupport()
 {
+	bool hasEnoughSupport = true;
 	if (hasF16cSupport() == false)
 	{
 		std::cerr << "Processor has no fp16 support" << std::endl;
+		hasEnoughSupport = false;
+	}
+	if (hasSse41Support() == false)
+	{
+		std::cerr << "Processor has no SSE4.1 support" << std::endl;
+		hasEnoughSupport = false;
+	}
+	return hasEnoughSupport;
+}
+
+int main()
+{
+	if (checkFeatureSupport() == false)
+	{
 		return 1;
 	}
-
 	unsigned char* image =reinterpret_cast<unsigned char*>(alignedMalloc(cSize,ALIGN));
 	short* gain  =reinterpret_cast<short*>(alignedMalloc(cSize*2,ALIGN));
 	float* gainOriginal = reinterpret_cast<float*>(alignedMalloc(cSize*4,ALIGN));

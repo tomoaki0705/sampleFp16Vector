@@ -51,6 +51,13 @@ bool checkFeatureSupport()
 		hasEnoughSupport = false;
 	}
 #endif
+#if defined(__arm__) || defined(_M_ARM)
+	if (hasNeonSupport() == false)
+	{
+		std::cerr << "Processor has no NEON support" << std::endl;
+		hasEnoughSupport = false;
+	}
+#endif
 	return hasEnoughSupport;
 }
 

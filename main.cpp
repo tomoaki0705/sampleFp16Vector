@@ -2,10 +2,7 @@
 #include <iomanip>
 #include <malloc.h>
 #ifdef _MSC_VER
-extern "C"
-{
-#include <stdlib.h>
-}
+#include <cstdlib>
 #define alignedMalloc(size,align)	_aligned_malloc(size,align)
 #elif defined (__GNUC__)
 #define alignedMalloc(size,align)	memalign(align,size)

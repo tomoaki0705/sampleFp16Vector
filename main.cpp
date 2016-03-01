@@ -8,6 +8,7 @@
 #define alignedMalloc(size,align)	memalign(align,size)
 #endif
 #include "floatMul.h"
+#include "featureSupport.h"
 
 const int ALIGN   = 32; // alignment step for SSE
 const int cWidth  = 256;

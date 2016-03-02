@@ -81,8 +81,9 @@ bool verifyMultiply()
 	uchar8 step     = load_uchar8(_step);
 	uchar8 original = load_uchar8(_original);
 	char before[cParallel], after[cParallel];
-	float _srcVectorDiv[4];
-	float _srcVectorMul[4];
+	float* _srcVectorDiv =reinterpret_cast<float*>(alignedMalloc(4,ALIGN));
+	float* _srcVectorMul =reinterpret_cast<float*>(alignedMalloc(4,ALIGN));
+	bool passedFlag = true;
 	for (int src = 1;src < 256;src++)
 	{
 		for (int i = 0;i < 4;i++)
@@ -103,24 +104,26 @@ bool verifyMultiply()
 			half4 compressHigh4   = compressToHalf4(dstIntegerHigh4, srcVectorDiv);
 
 			// uncompress the gain
-			dstIntegerLow4  = uncompressToInt4(compressLow4, srcVectorMul);
-			dstIntegerHigh4 = uncompressToInt4(compressLow4, srcVectorMul);
+			dstIntegerLow4  = uncompressToInt4(compressLow4,  srcVectorMul);
+			dstIntegerHigh4 = uncompressToInt4(compressHigh4, srcVectorMul);
 			dstShort8       = convert_uint4_ushort8(dstIntegerLow4, dstIntegerHigh4);
 			uchar8 resultChar8;
 			resultChar8     = convert_ushort8_uchar8(dstShort8);
 
 			store_uchar8((void*)before, dst);			
 			store_uchar8((void*)after,  resultChar8);
-			dst += step;
+			dst = dst + step;
 			for (int j = 0;j < cParallel;j++)
 			{
 				if (before[j] != after[j])
 				{
 					std::cerr << "error: src:" << src << " expected:" << (unsigned int)before[j] << " actual:" << (unsigned int)after[j] << std::endl;
+					passedFlag = false;
 				}
 			}
 		}
 	}
+	return passedFlag;
 }
 
 bool checkFeatureSupport()

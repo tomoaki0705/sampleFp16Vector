@@ -6,6 +6,8 @@ typedef float16x4_t half4;
 typedef uint8x8_t uchar8;
 typedef uint16x8_t ushort8;
 typedef uint32x4_t uint4; 
+inline uchar8 load_uchar8_copy(uint8_t c)   { return vdup_n_u8(c); }
+inline float4 load_float4_copy(float32_t f) { return vdupq_n_f32(f); }
 inline float4 load_float4(const float* ptr) { return *(float4*)ptr; }
 inline half4 load_half4(const short* ptr)   { return *(float16x4_t*)ptr; }
 inline uchar8 load_uchar8(const unsigned char* ptr) { return vld1_u8(ptr); }

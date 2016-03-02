@@ -22,5 +22,5 @@ elseif (ARM)
 	endif()
 endif()
 
-
+add_executable(verifyMultiply verifyMul.cpp floatMul.cpp ${FEATURESUPPORT})
 add_executable(sampleFp16 main.cpp floatMul.cpp ${FEATURESUPPORT})

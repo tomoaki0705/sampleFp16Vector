@@ -27,11 +27,13 @@ find_package(OpenCV REQUIRED)
 add_executable(verifyMultiply verifyMul.cpp ${FEATURESUPPORT})
 add_executable(sampleFp16 main.cpp ${FEATURESUPPORT})
 add_executable(floatImage2HalfImage converter.cpp ${FEATURESUPPORT})
+add_executable(demo demoMain.cpp ${FEATURESUPPORT})
 
 if(OpenCV_FOUND)
   include_directories(${OpenCV_INCLUDE_DIRS})
 
   target_link_libraries(floatImage2HalfImage ${OpenCV_LIBS})
+  target_link_libraries(demo ${OpenCV_LIBS})
 
   link_directories(${CUDA_CUDART_LIBRARY})
 endif(OpenCV_FOUND)

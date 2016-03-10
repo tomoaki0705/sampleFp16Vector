@@ -1,5 +1,6 @@
 
 #if defined(__x86_64__) || defined(_M_X64) || defined(_M_IX86) || defined(i386)
+#include <iostream>
 #include "featureSupport.h"
 #ifdef _MSC_VER
 #include <intrin.h>
@@ -51,6 +52,22 @@ bool hasF16cSupport()
 		hasSupport = getFeatureEcx() & (1 << 29) ? true : false;
 	}
 	return hasSupport;
+}
+
+bool checkFeatureSupport()
+{
+	bool hasEnoughSupport = true;
+	if (hasF16cSupport() == false)
+	{
+		std::cerr << "Processor has no fp16 support" << std::endl;
+		hasEnoughSupport = false;
+	}
+	if (hasSse41Support() == false)
+	{
+		std::cerr << "Processor has no SSE4.1 support" << std::endl;
+		hasEnoughSupport = false;
+	}
+	return hasEnoughSupport;
 }
 
 #endif

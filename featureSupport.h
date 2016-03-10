@@ -7,3 +7,4 @@ bool hasNeonSupport();
 bool hasSse41Support();
 #endif
 bool hasF16cSupport();
+bool checkFeatureSupport();

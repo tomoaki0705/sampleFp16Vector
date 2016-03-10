@@ -126,31 +126,6 @@ bool verifyMultiply()
 	return passedFlag;
 }
 
-bool checkFeatureSupport()
-{
-	bool hasEnoughSupport = true;
-	if (hasF16cSupport() == false)
-	{
-		std::cerr << "Processor has no fp16 support" << std::endl;
-		hasEnoughSupport = false;
-	}
-#if defined(__x86_64__) || defined(_M_X64) || defined(_M_IX86) || defined(i386)
-	if (hasSse41Support() == false)
-	{
-		std::cerr << "Processor has no SSE4.1 support" << std::endl;
-		hasEnoughSupport = false;
-	}
-#endif
-#if defined(__arm__) || defined(_M_ARM)
-	if (hasNeonSupport() == false)
-	{
-		std::cerr << "Processor has no NEON support" << std::endl;
-		hasEnoughSupport = false;
-	}
-#endif
-	return hasEnoughSupport;
-}
-
 int main()
 {
 	if (checkFeatureSupport() == false)

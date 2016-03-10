@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/auxv.h>
 #include <fcntl.h>
+#include <iostream>
 
 unsigned int getAuxv()
 {
@@ -34,6 +35,22 @@ bool hasF16cSupport()
 	bool hasSupport = false;
 
 	return getAuxv() & HWCAP_ARM_HALF;
+}
+
+bool checkFeatureSupport()
+{
+	bool hasEnoughSupport = true;
+	if (hasF16cSupport() == false)
+	{
+		std::cerr << "Processor has no fp16 support" << std::endl;
+		hasEnoughSupport = false;
+	}
+	if (hasNeonSupport() == false)
+	{
+		std::cerr << "Processor has no NEON support" << std::endl;
+		hasEnoughSupport = false;
+	}
+	return hasEnoughSupport;
 }
 
 #endif

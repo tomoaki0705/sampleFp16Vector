@@ -9,22 +9,24 @@
 const unsigned int defaultWidth  = 640;
 const unsigned int defaultHeight = 480;
 const double cHigh = 255.0f;
-const char defaultResultFile[] = "dump.png";
+const char defaultResultFileHalf[]  = "dumpHalf.png";
+const char defaultResultFileFloat[] = "dumpFloat.png";
 
-void convertUchar2Fp16(cv::Mat& image)
+void convertUchar2Fp16(const cv::Mat src, cv::Mat &dstFloat, cv::Mat &dstHalf)
 {
-	cv::Mat srcFloat  = cv::Mat(image.rows, image.cols, CV_32F);
-	float* floatPointer = (float*)srcFloat.data;
-	for (int y = 0; y < image.rows; y++)
+	dstFloat = cv::Mat(src.rows, src.cols, CV_32F);
+	dstHalf  = cv::Mat(src.rows, src.cols, CV_16S);
+	float* floatPointer = (float*)dstFloat.data;
+	short* halfPointer  = (short*)dstHalf.data;
+	for (int y = 0; y < src.rows; y++)
 	{
-	for (int x = 0; x < image.cols; x++)
+	for (int x = 0; x < src.cols; x++)
 	{
-		floatPointer[y*image.cols+x] = (float)(image.data[y*image.cols+x]/cHigh);
+		unsigned int index = y*src.cols+x;
+		floatPointer[index] = (float)(src.data[index]/cHigh);
 	}
 	}
-	image = cv::Mat(image.rows, image.cols, CV_16S);
-	short* halfPointer  = (short*)image.data;
-	float2half(floatPointer, halfPointer, image.cols*image.rows);
+	float2half(floatPointer, halfPointer, src.cols*src.rows);
 	return ;
 
 }
@@ -94,6 +96,13 @@ bool checkFeatureSupport()
 	return hasEnoughSupport;
 }
 
+bool forceFormatWrite(const cv::String &filename, cv::Mat &image, unsigned int width, unsigned int format)
+{
+	cv::Mat stub = cv::Mat(image.rows, width, format, image.data);
+	return cv::imwrite(filename, stub);
+}
+
+
 int main(int argc, char** argv)
 {
 	if (checkFeatureSupport() == false)
@@ -105,11 +114,12 @@ int main(int argc, char** argv)
 
 	prepareSourceImage(argc, argv, image);
 
-	convertUchar2Fp16(image);
+	cv::Mat floatImage;
+	cv::Mat halfImage;
+	convertUchar2Fp16(image, floatImage, halfImage);
 
-	cv::Mat stub = cv::Mat(image.rows, image.cols*2, CV_8UC1, image.data);
-
-	cv::imwrite(defaultResultFile, stub);
+	forceFormatWrite(defaultResultFileFloat, floatImage, floatImage.cols,  CV_8UC4);
+	forceFormatWrite(defaultResultFileHalf,  halfImage,  halfImage.cols*2, CV_8UC1);
 
 	return 0;
 }

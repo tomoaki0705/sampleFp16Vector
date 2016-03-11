@@ -8,6 +8,7 @@
 
 cv::VideoCapture capture;
 const char windowName[]  = "demo";
+const char header[] = "precision: ";
 const char* imagePath[][2] = {
 	{ "defaultMaskHalf.png", "defaultMaskFloat.png"},
 	{ "lenaMaskHalf.png",    "lenaMaskFloat.png"},
@@ -15,7 +16,7 @@ const char* imagePath[][2] = {
 
 enum precision
 {
-	percisionHalf,
+	precisionHalf,
 	precisionFloat,
 };
 enum device
@@ -79,8 +80,10 @@ int main(int argc, char**argv)
 
 	char key = -1;
 	enum device statusDevice = useCpuSimd;
-	cv::Mat stub = cv::imread(imagePath[0][0], cv::IMREAD_UNCHANGED);
-	cv::Mat gain = cv::Mat(stub.rows, stub.cols, CV_16SC1, stub.data);
+	enum precision statusPrecision = precisionFloat;
+	int index = 1;
+	cv::Mat stub = cv::imread(imagePath[index][0], cv::IMREAD_UNCHANGED);
+	cv::Mat gain = cv::Mat(stub.rows, stub.cols/2, CV_16SC1, stub.data);
 	while (isFinish(key) == false)
 	{
 		capture >> image;
@@ -89,13 +92,35 @@ int main(int argc, char**argv)
 		{
 		case 'h':
 		case 'H':
-			stub = cv::imread(imagePath[0][0], cv::IMREAD_UNCHANGED);
-			gain = cv::Mat(stub.rows, stub.cols, CV_16SC1, stub.data);
+			// switch to half precision
+			statusPrecision = precisionHalf;
+			std::cout << std::endl << header << "half  " << std::endl;
+			stub = cv::imread(imagePath[index][0], cv::IMREAD_UNCHANGED);
+			gain = cv::Mat(stub.rows, stub.cols/2, CV_16SC1, stub.data);
 			break;
 		case 'f':
 		case 'F':
-			stub = cv::imread(imagePath[0][1], cv::IMREAD_UNCHANGED);
+			// switch to single precision
+			statusPrecision = precisionFloat;
+			std::cout << std::endl << header << "single" << std::endl;
+			stub = cv::imread(imagePath[index][1], cv::IMREAD_UNCHANGED);
 			gain = cv::Mat(stub.rows, stub.cols, CV_32FC1, stub.data);
+			break;
+		case '0':
+		case '1':
+			index = key - '0';
+			if (statusPrecision == precisionHalf)
+			{
+				// precision half
+				stub = cv::imread(imagePath[index][0], cv::IMREAD_UNCHANGED);
+				gain = cv::Mat(stub.rows, stub.cols/2, CV_16SC1, stub.data);
+			}
+			else
+			{
+				// precision single
+				stub = cv::imread(imagePath[index][1], cv::IMREAD_UNCHANGED);
+				gain = cv::Mat(stub.rows, stub.cols, CV_32FC1, stub.data);
+			}
 			break;
 		default:
 			break;

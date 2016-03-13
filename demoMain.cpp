@@ -5,6 +5,7 @@
 #include "featureSupport.h"
 #include <string>
 #include <iostream>
+#include <iomanip>
 
 cv::VideoCapture capture;
 const char windowName[]  = "demo";
@@ -24,6 +25,48 @@ enum device
 	useCpuSimd,
 	useGpu,
 };
+
+void computeStatistics(double time, char key)
+{
+	const int cHistoryMax = 16;
+	static double history[cHistoryMax];
+	static double square [cHistoryMax];
+	static int iHistory = 0;
+	switch (key)
+	{
+	case 'h':
+	case 'H':
+	case 'f':
+	case 'F':
+		for (int i = 0; i < cHistoryMax; i++)
+		{
+			history[i] = 0.0f;
+			square[i] = 0.0f;
+			iHistory = 0;
+		}
+		break;
+	}
+
+	history[iHistory] = time;
+	square[iHistory]  = time * time;
+
+	double sum = 0.0f;
+	double squareSum = 0.0f;
+	for (int i = 0; i < cHistoryMax; i++)
+	{
+		sum += history[i];
+		squareSum += square[i];
+	}
+	double average = sum / (double)cHistoryMax;
+	squareSum /= cHistoryMax;
+	double variance = squareSum - (average * average);
+	std::cout << "average: " << std::fixed << std::setprecision(3) << average * 1000.0f << "[ms] ";
+	std::cout << "stddev: "  << std::fixed << std::setprecision(3) << sqrt(variance) * 1000.0f << "[ms]  \r";
+	std::cout << std::flush;
+
+	iHistory++;
+	iHistory = iHistory & (cHistoryMax-1);
+}
 
 double multiplyImage(cv::Mat &image, cv::Mat gain)
 {
@@ -142,8 +185,7 @@ int main(int argc, char**argv)
 			// CUDA
 			// empty for now
 		}
-		std::cout << elapsedTime * 1000.0f << "[ms]   \r";
-		std::cout << std::flush;
+		computeStatistics(elapsedTime, key);
 
 		cv::imshow(windowName, image);
 		key = cv::waitKey(1);

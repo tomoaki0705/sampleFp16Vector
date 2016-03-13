@@ -25,7 +25,7 @@ enum device
 	useGpu,
 };
 
-void multiplyImage(cv::Mat &image, cv::Mat gain)
+double multiplyImage(cv::Mat &image, cv::Mat gain)
 {
 	cv::Mat stub, b, g, r;
 	std::vector<cv::Mat> arrayColor;
@@ -33,7 +33,9 @@ void multiplyImage(cv::Mat &image, cv::Mat gain)
 	arrayColor.push_back(g);
 	arrayColor.push_back(r);
 	cv::split(image, arrayColor);
+	int64 begin, end;
 
+	begin = cv::getTickCount();
 	switch (gain.elemSize())
 	{
 	case 2:
@@ -51,7 +53,11 @@ void multiplyImage(cv::Mat &image, cv::Mat gain)
 		}
 		break;
 	}
+	end = cv::getTickCount();
 	cv::merge(arrayColor, image);
+
+	double tickCountElapsed = double(end - begin);
+	return tickCountElapsed/(double)cv::getTickFrequency();
 }
 
 bool isFinish(char key)
@@ -84,6 +90,7 @@ int main(int argc, char**argv)
 	int index = 1;
 	cv::Mat stub = cv::imread(imagePath[index][0], cv::IMREAD_UNCHANGED);
 	cv::Mat gain = cv::Mat(stub.rows, stub.cols/2, CV_16SC1, stub.data);
+	double elapsedTime;
 	while (isFinish(key) == false)
 	{
 		capture >> image;
@@ -128,13 +135,14 @@ int main(int argc, char**argv)
 
 		if (statusDevice == useCpuSimd)
 		{
-			multiplyImage(image, gain);
+			elapsedTime = multiplyImage(image, gain);
 		}
 		else
 		{
 			// CUDA
 			// empty for now
 		}
+		std::cout << elapsedTime * 1000.0f << "[ms]   \r";
 
 		cv::imshow(windowName, image);
 		key = cv::waitKey(1);

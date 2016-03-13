@@ -143,6 +143,7 @@ int main(int argc, char**argv)
 			// empty for now
 		}
 		std::cout << elapsedTime * 1000.0f << "[ms]   \r";
+		std::cout << std::flush;
 
 		cv::imshow(windowName, image);
 		key = cv::waitKey(1);

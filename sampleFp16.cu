@@ -20,7 +20,7 @@ __device__ int rgbToInt(float r, float g, float b)
 }
 
 __global__ void
-cudaProcessHalf(unsigned int *g_odata, short *g_indata, unsigned char* imageData, int imgw)
+cudaProcessHalf(unsigned int *g_odata, short *g_indata, unsigned int* imageData, int imgw)
 {
 	int tx = threadIdx.x;
 	int ty = threadIdx.y;
@@ -33,9 +33,11 @@ cudaProcessHalf(unsigned int *g_odata, short *g_indata, unsigned char* imageData
 	float gain;
 	gain = __half2float(a);
 
-	float b = imageData[(y*imgw+x)*3  ];
-	float g = imageData[(y*imgw+x)*3+1];
-	float r = imageData[(y*imgw+x)*3+2];
+	unsigned int p = imageData[y*imgw+x];
+
+	float b = (float)((p >> 16) & 0xff);
+	float g = (float)((p >>  8) & 0xff);
+	float r = (float)((p      ) & 0xff);
 
 	uchar4 c4;
 	c4.x = (unsigned char)(b * gain);
@@ -47,7 +49,7 @@ cudaProcessHalf(unsigned int *g_odata, short *g_indata, unsigned char* imageData
 extern "C" void
 launchCudaProcessHalf(dim3 grid, dim3 block, int sbytes,
 						short *gain,
-						unsigned char *imageInput,
+						unsigned int *imageInput,
 						unsigned int *imageOutput,
 						int imgw)
 {
@@ -56,7 +58,7 @@ launchCudaProcessHalf(dim3 grid, dim3 block, int sbytes,
 }
 
 __global__ void
-cudaProcessFloat(unsigned int *g_odata, float *g_indata, unsigned char* imageData, int imgw)
+cudaProcessFloat(unsigned int *g_odata, float *g_indata, unsigned int* imageData, int imgw)
 {
 	int tx = threadIdx.x;
 	int ty = threadIdx.y;
@@ -67,9 +69,11 @@ cudaProcessFloat(unsigned int *g_odata, float *g_indata, unsigned char* imageDat
 
 	float gain = g_indata[y*imgw+x];
 
-	float b = imageData[(y*imgw+x)*3  ];
-	float g = imageData[(y*imgw+x)*3+1];
-	float r = imageData[(y*imgw+x)*3+2];
+	unsigned int p = imageData[y*imgw+x];
+
+	float b = (float)((p >> 16) & 0xff);
+	float g = (float)((p >>  8) & 0xff);
+	float r = (float)((p      ) & 0xff);
 
 	uchar4 c4;
 	c4.x = (unsigned char)(b * gain);
@@ -81,7 +85,7 @@ cudaProcessFloat(unsigned int *g_odata, float *g_indata, unsigned char* imageDat
 extern "C" void
 launchCudaProcessFloat(dim3 grid, dim3 block, int sbytes,
 						float *gain,
-						unsigned char *imageInput,
+						unsigned int *imageInput,
 						unsigned int *imageOutput,
 						int imgw)
 {

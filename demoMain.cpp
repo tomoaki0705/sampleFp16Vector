@@ -19,8 +19,8 @@ const char* imagePath[][2] = {
 };
 short *gainCuda = NULL;
 float *gainFloatCuda = NULL;
-unsigned int *imageCuda = NULL;
-unsigned int *imageResult = NULL;
+unsigned char *imageCuda = NULL;
+unsigned char *imageResult = NULL;
 
 enum precision
 {
@@ -82,15 +82,15 @@ void computeStatistics(double time, char key)
 extern "C" void
 launchCudaProcessHalf(dim3 grid, dim3 block, int sbytes,
 						short *gain,
-						unsigned int *imageInput,
-						unsigned int *imageOutput,
+						unsigned char *imageInput,
+						unsigned char *imageOutput,
 						int imgw);
 
 extern "C" void
 launchCudaProcessFloat(dim3 grid, dim3 block, int sbytes,
 						float *gain,
-						unsigned int *imageInput,
-						unsigned int *imageOutput,
+						unsigned char *imageInput,
+						unsigned char *imageOutput,
 						int imgw);
 
 double multiplyImageCuda(cv::Mat &image, cv::Mat gain)
@@ -98,7 +98,7 @@ double multiplyImageCuda(cv::Mat &image, cv::Mat gain)
 	unsigned int image_width  = image.cols;
 	unsigned int image_height = image.rows;
 
-	cudaMemcpy(imageCuda, image.data, image_height*image_width*sizeof(int), cudaMemcpyHostToDevice);
+	cudaMemcpy(imageCuda, image.data, image_height*image_width*sizeof(char)*3, cudaMemcpyHostToDevice);
 
 	// calculate grid size
     dim3 block(16, 16, 1);
@@ -120,7 +120,7 @@ double multiplyImageCuda(cv::Mat &image, cv::Mat gain)
 		launchCudaProcessFloat(grid, block, 0, gainFloatCuda, imageCuda, imageResult, image_width);
 		break;
 	}
-	cudaMemcpy(image.data, imageResult, image_height*image_width*sizeof(int), cudaMemcpyDeviceToHost);
+	cudaMemcpy(image.data, imageResult, image_height*image_width*sizeof(char)*3, cudaMemcpyDeviceToHost);
 
 	double tickCountElapsed = double(end - begin);
 	return tickCountElapsed/(double)cv::getTickFrequency();
@@ -178,10 +178,21 @@ bool isFinish(char key)
 
 void initArray(cv::Mat &image)
 {
-	cudaMalloc((short**)&gainCuda, (sizeof(short)*image.rows*image.cols));
-	cudaMalloc((float**)&gainFloatCuda, (sizeof(float)*image.rows*image.cols));
-	cudaMalloc((unsigned int**)&imageCuda, (sizeof(unsigned int)*image.rows*image.cols));
-	cudaMalloc((unsigned int**)&imageResult, (sizeof(unsigned int)*image.rows*image.cols));
+	unsigned int w = image.cols;
+	unsigned int h = image.rows;
+	unsigned int s = w * h;
+	cudaMalloc((short**)&gainCuda, (s*sizeof(short)));
+	cudaMalloc((float**)&gainFloatCuda, (s*sizeof(float)));
+	cudaMalloc((unsigned char**)&imageCuda, (s*sizeof(unsigned char)*3));
+	cudaMalloc((unsigned char**)&imageResult, (s*sizeof(unsigned char)*3));
+}
+
+void releaseArray()
+{
+	cudaFree((void*)gainCuda);
+	cudaFree((void*)gainFloatCuda);
+	cudaFree((void*)imageCuda);
+	cudaFree((void*)imageResult);
 }
 
 bool initCuda()
@@ -279,18 +290,17 @@ int main(int argc, char**argv)
 		else
 		{
 			// CUDA
-			cv::Mat imageBGRA;
-			cv::cvtColor(image, imageBGRA, cv::COLOR_BGR2BGRA);
-			elapsedTime = multiplyImageCuda(imageBGRA, gain);
-			cv::cvtColor(imageBGRA, image, cv::COLOR_BGRA2BGR);
+			// empty for now
+			elapsedTime = multiplyImageCuda(image, gain);
 		}
 		computeStatistics(elapsedTime, key);
 
 		cv::imshow(windowName, image);
 		key = cv::waitKey(1);
 	}
-
+	std::cout << std::endl;
 	cv::destroyAllWindows();
+	releaseArray();
 
 	return 0;
 }

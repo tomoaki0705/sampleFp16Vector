@@ -1,8 +1,8 @@
 
 // clamp x to range [a, b]
-__device__ float clamp(float x, float a, float b)
+__device__ unsigned char clamp(float x, float a, float b)
 {
-    return max(a, min(b, x));
+    return (unsigned char)(max(a, min(b, x)));
 }
 
 __device__ int clamp(int x, int a, int b)
@@ -20,7 +20,7 @@ __device__ int rgbToInt(float r, float g, float b)
 }
 
 __global__ void
-cudaProcessHalf(unsigned int *g_odata, short *g_indata, unsigned int* imageData, int imgw)
+cudaProcessHalf(unsigned char *g_odata, short *g_indata, unsigned char* imageData, int imgw)
 {
 	int tx = threadIdx.x;
 	int ty = threadIdx.y;
@@ -33,24 +33,20 @@ cudaProcessHalf(unsigned int *g_odata, short *g_indata, unsigned int* imageData,
 	float gain;
 	gain = __half2float(a);
 
-	unsigned int p = imageData[y*imgw+x];
+	float b = imageData[(y*imgw+x)*3  ];
+	float g = imageData[(y*imgw+x)*3+1];
+	float r = imageData[(y*imgw+x)*3+2];
 
-	float b = (float)((p >> 16) & 0xff);
-	float g = (float)((p >>  8) & 0xff);
-	float r = (float)((p      ) & 0xff);
-
-	uchar4 c4;
-	c4.x = (unsigned char)(b * gain);
-	c4.y = (unsigned char)(g * gain);
-	c4.z = (unsigned char)(r * gain);
-	g_odata[y*imgw+x] = rgbToInt(c4.z, c4.y, c4.x);
+	g_odata[(y*imgw+x)*3  ] = clamp(b * gain, 0.0f, 255.0f);
+	g_odata[(y*imgw+x)*3+1] = clamp(g * gain, 0.0f, 255.0f);
+	g_odata[(y*imgw+x)*3+2] = clamp(r * gain, 0.0f, 255.0f);
 }
 
 extern "C" void
 launchCudaProcessHalf(dim3 grid, dim3 block, int sbytes,
 						short *gain,
-						unsigned int *imageInput,
-						unsigned int *imageOutput,
+						unsigned char *imageInput,
+						unsigned char *imageOutput,
 						int imgw)
 {
     cudaProcessHalf<<< grid, block, sbytes >>>(imageOutput, gain, imageInput, imgw);
@@ -58,7 +54,7 @@ launchCudaProcessHalf(dim3 grid, dim3 block, int sbytes,
 }
 
 __global__ void
-cudaProcessFloat(unsigned int *g_odata, float *g_indata, unsigned int* imageData, int imgw)
+cudaProcessFloat(unsigned char *g_odata, float *g_indata, unsigned char* imageData, int imgw)
 {
 	int tx = threadIdx.x;
 	int ty = threadIdx.y;
@@ -69,24 +65,20 @@ cudaProcessFloat(unsigned int *g_odata, float *g_indata, unsigned int* imageData
 
 	float gain = g_indata[y*imgw+x];
 
-	unsigned int p = imageData[y*imgw+x];
+	float b = imageData[(y*imgw+x)*3  ];
+	float g = imageData[(y*imgw+x)*3+1];
+	float r = imageData[(y*imgw+x)*3+2];
 
-	float b = (float)((p >> 16) & 0xff);
-	float g = (float)((p >>  8) & 0xff);
-	float r = (float)((p      ) & 0xff);
-
-	uchar4 c4;
-	c4.x = (unsigned char)(b * gain);
-	c4.y = (unsigned char)(g * gain);
-	c4.z = (unsigned char)(r * gain);
-	g_odata[y*imgw+x] = rgbToInt(c4.z, c4.y, c4.x);
+	g_odata[(y*imgw+x)*3  ] = clamp(b * gain, 0.0f, 255.0f);
+	g_odata[(y*imgw+x)*3+1] = clamp(g * gain, 0.0f, 255.0f);
+	g_odata[(y*imgw+x)*3+2] = clamp(r * gain, 0.0f, 255.0f);
 }
 
 extern "C" void
 launchCudaProcessFloat(dim3 grid, dim3 block, int sbytes,
 						float *gain,
-						unsigned int *imageInput,
-						unsigned int *imageOutput,
+						unsigned char *imageInput,
+						unsigned char *imageOutput,
 						int imgw)
 {
     cudaProcessFloat<<< grid, block, sbytes >>>(imageOutput, gain, imageInput, imgw);

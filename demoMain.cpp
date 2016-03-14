@@ -7,8 +7,10 @@
 #include <string>
 #include <iostream>
 #include <iomanip>
+#ifdef HAVE_CUDA
 // CUDA includes
 #include <cuda_runtime.h>
+#endif // HAVE_CUDA
 
 cv::VideoCapture capture;
 const char windowName[]  = "demo";
@@ -79,6 +81,7 @@ void computeStatistics(double time, char key)
 	iHistory = iHistory & (cHistoryMax-1);
 }
 
+#ifdef HAVE_CUDA
 extern "C" void
 launchCudaProcessHalf(dim3 grid, dim3 block, int sbytes,
 						short *gain,
@@ -125,6 +128,7 @@ double multiplyImageCuda(cv::Mat &image, cv::Mat gain)
 	double tickCountElapsed = double(end - begin);
 	return tickCountElapsed/(double)cv::getTickFrequency();
 }
+#endif // HAVE_CUDA
 
 double multiplyImage(cv::Mat &image, cv::Mat gain)
 {
@@ -176,6 +180,7 @@ bool isFinish(char key)
 	return finishKey;
 }
 
+#ifdef HAVE_CUDA
 void initArray(cv::Mat &image)
 {
 	unsigned int w = image.cols;
@@ -211,6 +216,11 @@ bool initCuda()
 
 	return true;
 }
+#else 
+void initArray(cv::Mat &image){}
+void releaseArray(){}
+bool initCuda(){ return false; }
+#endif // HAVE_CUDA
 
 int main(int argc, char**argv)
 {
@@ -289,9 +299,10 @@ int main(int argc, char**argv)
 		}
 		else
 		{
+#ifdef HAVE_CUDA
 			// CUDA
-			// empty for now
 			elapsedTime = multiplyImageCuda(image, gain);
+#endif // HAVE_CUDA
 		}
 		computeStatistics(elapsedTime, key);
 

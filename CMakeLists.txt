@@ -23,20 +23,25 @@ elseif (ARM)
 endif()
 
 find_package(OpenCV REQUIRED)
-find_package(CUDA REQUIRED)
+find_package(CUDA)
 
 add_executable(verifyMultiply verifyMul.cpp ${FEATURESUPPORT})
 add_executable(sampleFp16 main.cpp ${FEATURESUPPORT})
 add_executable(floatImage2HalfImage converter.cpp ${FEATURESUPPORT})
-cuda_add_executable(demo demoMain.cpp sampleFp16.cu ${FEATURESUPPORT})
 
 if(OpenCV_FOUND)
   include_directories(${OpenCV_INCLUDE_DIRS})
 
   target_link_libraries(floatImage2HalfImage ${OpenCV_LIBS})
+  if(CUDA_FOUND)
+    cuda_add_executable(demo demoMain.cpp sampleFp16.cu ${FEATURESUPPORT})
+    link_directories(${CUDA_CUDART_LIBRARY})
+	add_definitions(-DHAVE_CUDA)
+  else(CUDA_NOT_FOUND)
+    add_executable(demo demoMain.cpp sampleFp16.cu ${FEATURESUPPORT})
+  endif(CUDA_FOUND)
   target_link_libraries(demo ${OpenCV_LIBS})
 
-  link_directories(${CUDA_CUDART_LIBRARY})
 endif(OpenCV_FOUND)
 
 set(DATA_DIR ${CMAKE_SOURCE_DIR}/data)

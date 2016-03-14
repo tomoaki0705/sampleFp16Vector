@@ -6,6 +6,8 @@
 #include <string>
 #include <iostream>
 #include <iomanip>
+// CUDA includes
+#include <cuda_runtime.h>
 
 cv::VideoCapture capture;
 const char windowName[]  = "demo";
@@ -14,6 +16,10 @@ const char* imagePath[][2] = {
 	{ "defaultMaskHalf.png", "defaultMaskFloat.png"},
 	{ "lenaMaskHalf.png",    "lenaMaskFloat.png"},
 };
+short *gainCuda = NULL;
+float *gainFloatCuda = NULL;
+unsigned char *imageCuda = NULL;
+unsigned int *imageResult = NULL;
 
 enum precision
 {
@@ -68,6 +74,53 @@ void computeStatistics(double time, char key)
 	iHistory = iHistory & (cHistoryMax-1);
 }
 
+extern "C" void
+launchCudaProcessHalf(dim3 grid, dim3 block, int sbytes,
+						short *gain,
+						unsigned char *imageInput,
+						unsigned int *imageOutput,
+						int imgw);
+
+extern "C" void
+launchCudaProcessFloat(dim3 grid, dim3 block, int sbytes,
+						float *gain,
+						unsigned char *imageInput,
+						unsigned int *imageOutput,
+						int imgw);
+
+double multiplyImageCuda(cv::Mat &image, cv::Mat gain)
+{
+	unsigned int image_width  = image.cols;
+	unsigned int image_height = image.rows;
+
+	cudaMemcpy(imageCuda, image.data, image_height*image_width*sizeof(char)*3, cudaMemcpyHostToDevice);
+
+	// calculate grid size
+    dim3 block(16, 16, 1);
+    dim3 grid(image_width / block.x, image_height / block.y, 1);
+	int64 begin, end;
+
+	switch (gain.elemSize())
+	{
+	case 2:
+		begin = cv::getTickCount();
+		cudaMemcpy(gainCuda,  gain.data,  image_height*image_width*sizeof(short),  cudaMemcpyHostToDevice);
+		end = cv::getTickCount();
+		launchCudaProcessHalf(grid, block, 0, gainCuda, imageCuda, imageResult, image_width);
+		break;
+	case 4:
+		begin = cv::getTickCount();
+		cudaMemcpy(gainFloatCuda,  gain.data,  image_height*image_width*sizeof(float),  cudaMemcpyHostToDevice);
+		end = cv::getTickCount();
+		launchCudaProcessFloat(grid, block, 0, gainFloatCuda, imageCuda, imageResult, image_width);
+		break;
+	}
+	cudaMemcpy(image.data, imageResult, image_height*image_width*sizeof(char)*3, cudaMemcpyDeviceToDevice);
+
+	double tickCountElapsed = double(end - begin);
+	return tickCountElapsed/(double)cv::getTickFrequency();
+}
+
 double multiplyImage(cv::Mat &image, cv::Mat gain)
 {
 	cv::Mat stub, b, g, r;
@@ -118,6 +171,32 @@ bool isFinish(char key)
 	return finishKey;
 }
 
+void initArray(cv::Mat &image)
+{
+	cudaMalloc((short**)&gainCuda, (sizeof(short)*image.rows*image.cols));
+	cudaMalloc((float**)&gainFloatCuda, (sizeof(float)*image.rows*image.cols));
+	cudaMalloc((unsigned char**)&imageCuda, (sizeof(unsigned char)*image.rows*image.cols*3));
+	cudaMalloc((unsigned int**)&imageResult, (sizeof(unsigned int)*image.rows*image.cols));
+}
+
+bool initCuda()
+{
+	cudaDeviceProp deviceProp;
+	int devID = 0;
+	int device_count= 0;
+
+	cudaGetDeviceCount(&device_count);
+
+	if (device_count < 1)
+	{
+		return false;
+	}
+
+	cudaSetDevice(devID);
+    cudaGetDeviceProperties(&deviceProp, devID);
+    printf("GPU Device %d: \"%s\" with compute capability %d.%d\n\n", devID, deviceProp.name, deviceProp.major, deviceProp.minor);
+}
+
 int main(int argc, char**argv)
 {
 	capture.open(0);
@@ -126,6 +205,9 @@ int main(int argc, char**argv)
 
 	cv::namedWindow(windowName);
 	cv::imshow(windowName, image);
+
+	initCuda();
+	initArray(image);
 
 	char key = -1;
 	enum device statusDevice = useCpuSimd;
@@ -184,6 +266,7 @@ int main(int argc, char**argv)
 		{
 			// CUDA
 			// empty for now
+			elapsedTime = multiplyImageCuda(image, gain);
 		}
 		computeStatistics(elapsedTime, key);
 

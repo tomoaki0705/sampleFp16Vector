@@ -23,11 +23,12 @@ elseif (ARM)
 endif()
 
 find_package(OpenCV REQUIRED)
+find_package(CUDA REQUIRED)
 
 add_executable(verifyMultiply verifyMul.cpp ${FEATURESUPPORT})
 add_executable(sampleFp16 main.cpp ${FEATURESUPPORT})
 add_executable(floatImage2HalfImage converter.cpp ${FEATURESUPPORT})
-add_executable(demo demoMain.cpp ${FEATURESUPPORT})
+cuda_add_executable(demo demoMain.cpp sampleFp16.cu ${FEATURESUPPORT})
 
 if(OpenCV_FOUND)
   include_directories(${OpenCV_INCLUDE_DIRS})

@@ -13,6 +13,7 @@
 #endif // HAVE_CUDA
 
 cv::VideoCapture capture;
+const char dumpFilename[] = "dump.png";
 const char windowName[]  = "demo";
 const char header[] = "precision: ";
 const char* imagePath[][2] = {
@@ -305,6 +306,11 @@ int main(int argc, char**argv)
 #endif // HAVE_CUDA
 		}
 		computeStatistics(elapsedTime, key);
+
+		if (key == 's' || key == 'S')
+		{
+			cv::imwrite(dumpFilename, image);
+		}
 
 		cv::imshow(windowName, image);
 		key = cv::waitKey(1);

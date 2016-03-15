@@ -11,6 +11,7 @@ const unsigned int defaultHeight = 480;
 const double cHigh = 255.0f;
 const char defaultResultFileHalf[]  = "dumpHalf.png";
 const char defaultResultFileFloat[] = "dumpFloat.png";
+const char defaultResultFileGray[]  = "dumpGray.png";
 
 void convertUchar2Fp16(const cv::Mat src, cv::Mat &dstFloat, cv::Mat &dstHalf)
 {
@@ -93,6 +94,7 @@ int main(int argc, char** argv)
 	cv::Mat halfImage;
 	convertUchar2Fp16(image, floatImage, halfImage);
 
+	forceFormatWrite(defaultResultFileGray,  image,      image.cols,       CV_8UC1);
 	forceFormatWrite(defaultResultFileFloat, floatImage, floatImage.cols,  CV_8UC4);
 	forceFormatWrite(defaultResultFileHalf,  halfImage,  halfImage.cols*2, CV_8UC1);
 

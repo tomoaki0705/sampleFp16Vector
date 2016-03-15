@@ -16,9 +16,9 @@ cv::VideoCapture capture;
 const char dumpFilename[] = "dump.png";
 const char windowName[]  = "demo";
 const char header[] = "precision: ";
-const char* imagePath[][2] = {
-	{ "defaultMaskHalf.png", "defaultMaskFloat.png"},
-	{ "lenaMaskHalf.png",    "lenaMaskFloat.png"},
+const char* imagePath[][3] = {
+	{ "defaultMaskHalf.png", "defaultMaskFloat.png", "defaultMaskGray.png"},
+	{ "lenaMaskHalf.png",    "lenaMaskFloat.png",    "lenaMaskGray.png"},
 };
 short *gainCuda = NULL;
 float *gainFloatCuda = NULL;
@@ -29,6 +29,7 @@ enum precision
 {
 	precisionHalf,
 	precisionFloat,
+	precisionByte,
 };
 enum device
 {
@@ -48,6 +49,8 @@ void computeStatistics(double time, char key)
 	case 'H':
 	case 'f':
 	case 'F':
+	case 'b':
+	case 'B':
 	case 'c':
 	case 'C':
 	case 'g':
@@ -111,6 +114,9 @@ double multiplyImageCuda(cv::Mat &image, cv::Mat gain)
 
 	switch (gain.elemSize())
 	{
+	case 1:
+		// empty for now
+		return 0;
 	case 2:
 		begin = cv::getTickCount();
 		cudaMemcpy(gainCuda,  gain.data,  image_height*image_width*sizeof(short),  cudaMemcpyHostToDevice);
@@ -144,6 +150,9 @@ double multiplyImage(cv::Mat &image, cv::Mat gain)
 	begin = cv::getTickCount();
 	switch (gain.elemSize())
 	{
+	case 1:
+		arrayColor.push_back(gain);
+		break;
 	case 2:
 		for (unsigned int i = 0; i < arrayColor.size(); i++)
 		{
@@ -264,20 +273,34 @@ int main(int argc, char**argv)
 			stub = cv::imread(imagePath[index][1], cv::IMREAD_UNCHANGED);
 			gain = cv::Mat(stub.rows, stub.cols, CV_32FC1, stub.data);
 			break;
+		case 'b':
+		case 'B':
+			// switch to gray gain
+			statusPrecision = precisionByte;
+			std::cout << std::endl << header << "char" << std::endl;
+			gain = cv::imread(imagePath[index][2], cv::IMREAD_GRAYSCALE);
+			break;
 		case '0':
 		case '1':
 			index = key - '0';
-			if (statusPrecision == precisionHalf)
+			switch (statusPrecision)
 			{
+			case precisionHalf:
 				// precision half
 				stub = cv::imread(imagePath[index][0], cv::IMREAD_UNCHANGED);
 				gain = cv::Mat(stub.rows, stub.cols/2, CV_16SC1, stub.data);
-			}
-			else
-			{
+				break;
+			case precisionFloat:
 				// precision single
 				stub = cv::imread(imagePath[index][1], cv::IMREAD_UNCHANGED);
 				gain = cv::Mat(stub.rows, stub.cols, CV_32FC1, stub.data);
+				break;
+			case precisionByte:
+				// precision single
+				gain = cv::imread(imagePath[index][2], cv::IMREAD_GRAYSCALE);
+				break;
+			default:
+				break;
 			}
 			break;
 		case 'c':

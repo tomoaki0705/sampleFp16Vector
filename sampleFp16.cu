@@ -84,3 +84,35 @@ launchCudaProcessFloat(dim3 grid, dim3 block, int sbytes,
     cudaProcessFloat<<< grid, block, sbytes >>>(imageOutput, gain, imageInput, imgw);
 
 }
+
+__global__ void
+cudaProcessByte(unsigned char *g_odata, unsigned char *g_indata, unsigned char* imageData, int imgw)
+{
+	int tx = threadIdx.x;
+	int ty = threadIdx.y;
+	int bw = blockDim.x;
+	int bh = blockDim.y;
+	int x = blockIdx.x*bw + tx;
+	int y = blockIdx.y*bh + ty;
+
+	float gain = (float)g_indata[y*imgw+x] / 255.0f;
+
+	float b = imageData[(y*imgw+x)*3  ];
+	float g = imageData[(y*imgw+x)*3+1];
+	float r = imageData[(y*imgw+x)*3+2];
+
+	g_odata[(y*imgw+x)*3  ] = clamp(b * gain, 0.0f, 255.0f);
+	g_odata[(y*imgw+x)*3+1] = clamp(g * gain, 0.0f, 255.0f);
+	g_odata[(y*imgw+x)*3+2] = clamp(r * gain, 0.0f, 255.0f);
+}
+
+extern "C" void
+launchCudaProcessByte(dim3 grid, dim3 block, int sbytes,
+						unsigned char *gain,
+						unsigned char *imageInput,
+						unsigned char *imageOutput,
+						int imgw)
+{
+    cudaProcessByte<<< grid, block, sbytes >>>(imageOutput, gain, imageInput, imgw);
+
+}

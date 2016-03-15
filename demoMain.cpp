@@ -22,6 +22,7 @@ const char* imagePath[][3] = {
 };
 short *gainCuda = NULL;
 float *gainFloatCuda = NULL;
+unsigned char *gainByteCuda = NULL;
 unsigned char *imageCuda = NULL;
 unsigned char *imageResult = NULL;
 
@@ -100,6 +101,13 @@ launchCudaProcessFloat(dim3 grid, dim3 block, int sbytes,
 						unsigned char *imageOutput,
 						int imgw);
 
+extern "C" void
+launchCudaProcessByte(dim3 grid, dim3 block, int sbytes,
+						unsigned char *gain,
+						unsigned char *imageInput,
+						unsigned char *imageOutput,
+						int imgw);
+
 double multiplyImageCuda(cv::Mat &image, cv::Mat gain)
 {
 	unsigned int image_width  = image.cols;
@@ -115,8 +123,11 @@ double multiplyImageCuda(cv::Mat &image, cv::Mat gain)
 	switch (gain.elemSize())
 	{
 	case 1:
-		// empty for now
-		return 0;
+		begin = cv::getTickCount();
+		cudaMemcpy(gainByteCuda,  gain.data,  image_height*image_width*sizeof(char),  cudaMemcpyHostToDevice);
+		end = cv::getTickCount();
+		launchCudaProcessByte(grid, block, 0, gainByteCuda, imageCuda, imageResult, image_width);
+		break;
 	case 2:
 		begin = cv::getTickCount();
 		cudaMemcpy(gainCuda,  gain.data,  image_height*image_width*sizeof(short),  cudaMemcpyHostToDevice);
@@ -203,6 +214,7 @@ void initArray(cv::Mat &image)
 	unsigned int s = w * h;
 	cudaMalloc((short**)&gainCuda, (s*sizeof(short)));
 	cudaMalloc((float**)&gainFloatCuda, (s*sizeof(float)));
+	cudaMalloc((unsigned char**)&gainByteCuda, (s*sizeof(unsigned char)));
 	cudaMalloc((unsigned char**)&imageCuda, (s*sizeof(unsigned char)*3));
 	cudaMalloc((unsigned char**)&imageResult, (s*sizeof(unsigned char)*3));
 }
@@ -211,6 +223,7 @@ void releaseArray()
 {
 	cudaFree((void*)gainCuda);
 	cudaFree((void*)gainFloatCuda);
+	cudaFree((void*)gainByteCuda);
 	cudaFree((void*)imageCuda);
 	cudaFree((void*)imageResult);
 }

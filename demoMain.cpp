@@ -139,7 +139,7 @@ double multiplyImageCuda(cv::Mat &image, cv::Mat gain)
 
 double multiplyImage(cv::Mat &image, cv::Mat gain)
 {
-	cv::Mat stub, b, g, r;
+	cv::Mat stub, b, g, r, stubGain;
 	std::vector<cv::Mat> arrayColor;
 	arrayColor.push_back(b);
 	arrayColor.push_back(g);
@@ -151,7 +151,12 @@ double multiplyImage(cv::Mat &image, cv::Mat gain)
 	switch (gain.elemSize())
 	{
 	case 1:
-		arrayColor.push_back(gain);
+		gain.convertTo(stubGain, CV_32FC1, 1/255.0f);
+		for (unsigned int i = 0; i < arrayColor.size(); i++)
+		{
+			arrayColor[i].convertTo(stub, CV_32FC1);
+			multiply(stub, stubGain, arrayColor[i], 1.0, CV_8UC1);
+		}
 		break;
 	case 2:
 		for (unsigned int i = 0; i < arrayColor.size(); i++)

@@ -10,7 +10,7 @@
 #include "floatMul.h"
 #include "featureSupport.h"
 
-const int ALIGN   = 32; // alignment step for SSE
+const int ALIGN   = 16; // alignment step for SSE
 const int cWidth  = 256;
 const int cHeight = cWidth;
 const int cSize   = cHeight * cWidth;

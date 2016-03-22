@@ -11,7 +11,7 @@
 #include "featureSupport.h"
 #include "simdUtils.h"
 
-const int ALIGN   = 32; // alignment step for SSE
+const int ALIGN   = 16; // alignment step for SSE
 const int cWidth  = 256;
 const int cHeight = cWidth;
 const int cSize   = cHeight * cWidth;
@@ -33,46 +33,6 @@ uint4 uncompressToInt4(half4 halfVector, float4 srcVector)
 }
 
 
-
-//uint8x8_t   vdup_n_u8(uint8_t value);      // VDUP.8 d0,r0 
-//uint16x4_t  vdup_n_u16(uint16_t value);    // VDUP.16 d0,r0
-//uint32x2_t  vdup_n_u32(uint32_t value);    // VDUP.32 d0,r0
-//int8x8_t    vdup_n_s8(int8_t value);       // VDUP.8 d0,r0 
-//int16x4_t   vdup_n_s16(int16_t value);     // VDUP.16 d0,r0
-//int32x2_t   vdup_n_s32(int32_t value);     // VDUP.32 d0,r0
-//poly8x8_t   vdup_n_p8(poly8_t value);      // VDUP.8 d0,r0 
-//poly16x4_t  vdup_n_p16(poly16_t value);    // VDUP.16 d0,r0
-//float32x2_t vdup_n_f32(float32_t value);   // VDUP.32 d0,r0
-//uint8x16_t  vdupq_n_u8(uint8_t value);     // VDUP.8 q0,r0 
-//uint16x8_t  vdupq_n_u16(uint16_t value);   // VDUP.16 q0,r0
-//uint32x4_t  vdupq_n_u32(uint32_t value);   // VDUP.32 q0,r0
-//int8x16_t   vdupq_n_s8(int8_t value);      // VDUP.8 q0,r0 
-//int16x8_t   vdupq_n_s16(int16_t value);    // VDUP.16 q0,r0
-//int32x4_t   vdupq_n_s32(int32_t value);    // VDUP.32 q0,r0
-//poly8x16_t  vdupq_n_p8(poly8_t value);     // VDUP.8 q0,r0 
-//poly16x8_t  vdupq_n_p16(poly16_t value);   // VDUP.16 q0,r0
-//float32x4_t vdupq_n_f32(float32_t value);  // VDUP.32 q0,r0
-//int64x1_t   vdup_n_s64(int64_t value);     // VMOV d0,r0,r0
-//uint64x1_t  vdup_n_u64(uint64_t value);    // VMOV d0,r0,r0
-//int64x2_t   vdupq_n_s64(int64_t value);    // VMOV d0,r0,r0
-//uint64x2_t  vdupq_n_u64(uint64_t value);   // VMOV d0,r0,r0
-//uint8x8_t   vmov_n_u8(uint8_t value);      // VDUP.8 d0,r0 
-//uint16x4_t  vmov_n_u16(uint16_t value);    // VDUP.16 d0,r0
-//uint32x2_t  vmov_n_u32(uint32_t value);    // VDUP.32 d0,r0
-//int8x8_t    vmov_n_s8(int8_t value);       // VDUP.8 d0,r0 
-//int16x4_t   vmov_n_s16(int16_t value);     // VDUP.16 d0,r0
-//int32x2_t   vmov_n_s32(int32_t value);     // VDUP.32 d0,r0
-//poly8x8_t   vmov_n_p8(poly8_t value);      // VDUP.8 d0,r0 
-//poly16x4_t  vmov_n_p16(poly16_t value);    // VDUP.16 d0,r0
-//float32x2_t vmov_n_f32(float32_t value);   // VDUP.32 d0,r0
-//uint8x16_t  vmovq_n_u8(uint8_t value);     // VDUP.8 q0,r0 
-//uint16x8_t  vmovq_n_u16(uint16_t value);   // VDUP.16 q0,r0
-//uint32x4_t  vmovq_n_u32(uint32_t value);   // VDUP.32 q0,r0
-//int8x16_t   vmovq_n_s8(int8_t value);      // VDUP.8 q0,r0 
-//int16x8_t   vmovq_n_s16(int16_t value);    // VDUP.16 q0,r0
-//int32x4_t   vmovq_n_s32(int32_t value);    // VDUP.32 q0,r0
-//poly8x16_t  vmovq_n_p8(poly8_t value);     // VDUP.8 q0,r0 
-//poly16x8_t  vmovq_n_p16(poly16_t value);   // VDUP.16 q0,r0
 bool verifyMultiply()
 {
 	const unsigned char cParallel = 8;

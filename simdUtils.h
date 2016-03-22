@@ -13,6 +13,7 @@ inline half4 load_half4(const short* ptr)   { return *(float16x4_t*)ptr; }
 inline uchar8 load_uchar8(const unsigned char* ptr) { return vld1_u8(ptr); }
 inline void store_half4(void* ptr, half4 h) { *(half4*)ptr = h; }
 inline void store_uchar8(void* ptr, uchar8 c)   { vst1_u8((unsigned char*)ptr, c); }
+inline void store_uint4(void* ptr, uint4 i) { vst1q_u32((unsigned int*)ptr, i); } 
 inline half4 convert_float4_half4(float4 f) { return vcvt_f16_f32(f); }
 inline ushort8 convert_uchar8_ushort8(uchar8 c) { return vmovl_u8(c); }
 inline uint4 convert_ushort8_lo_uint4(ushort8 s){ return vmovl_u16(vget_low_s16 (s)); }
@@ -35,6 +36,7 @@ inline half4 load_half4(const short* ptr)   { return _mm_loadl_epi64((const half
 inline uchar8 load_uchar8(const unsigned char* ptr) { return _mm_loadl_epi64((const uchar8*)ptr); }
 inline void store_half4(void* ptr, half4 h) { _mm_storel_epi64((half4*)ptr, h); }
 inline void store_uchar8(void* ptr, uchar8 c)   { _mm_storel_epi64((uchar8*)ptr, c); }
+inline void store_uint4(void* ptr, uint4 i) { _mm_store_si128((uint4*)ptr, i); } 
 inline half4 convert_float4_half4(float4 f) { return _mm_cvtps_ph(f, 0); }
 inline ushort8 convert_uchar8_ushort8(uchar8 c) { return _mm_cvtepu8_epi16(c); }
 inline uint4 convert_ushort8_lo_uint4(ushort8 s){ __m128i v_zero = _mm_setzero_si128(); return _mm_unpacklo_epi16(s, v_zero); }

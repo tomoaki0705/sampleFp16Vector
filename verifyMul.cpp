@@ -35,6 +35,26 @@ uint4 uncompressToInt4(half4 halfVector, float4 srcVector)
 
 bool verifyMultiply()
 {
+	float _originalFloat[] = {1.1f,  1.49f, 1.50f, 1.99f, 1.0000001f, 1.4999999f, 1.5000000f, 1.9999999f, };
+	float* originalFloat = reinterpret_cast<float*>(alignedMalloc(8,ALIGN));
+	unsigned int* converted = reinterpret_cast<unsigned int*>(alignedMalloc(8,ALIGN));
+	for (int i = 0;i < 8;i++)
+	{
+		originalFloat[i] = _originalFloat[i];
+	}
+
+	float4 srcFloat1 = load_float4((const float*)originalFloat);
+	float4 srcFloat2 = load_float4((const float*)&originalFloat[4]);
+	uint4 dstInt1 = convert_float4_uint4(srcFloat1);
+	uint4 dstInt2 = convert_float4_uint4(srcFloat2);
+	store_uint4(&converted[0], dstInt1);
+	store_uint4(&converted[4], dstInt2);
+
+	std::cout << originalFloat[0] << '\t' << originalFloat[1] << '\t' << originalFloat[2] << '\t' << originalFloat[3] << std::endl;
+	std::cout << converted[0]     << '\t' << converted[1]     << '\t' << converted[2]     << '\t' << converted[3]     << std::endl;
+	std::cout << originalFloat[0] << '\t' << originalFloat[1] << '\t' << originalFloat[2] << '\t' << originalFloat[3] << std::endl;
+	std::cout << converted[4]     << '\t' << converted[5]     << '\t' << converted[6]     << '\t' << converted[7]     << std::endl;
+
 	const unsigned char cParallel = 8;
 	unsigned char _step[]     = {cParallel, cParallel, cParallel, cParallel, cParallel, cParallel, cParallel, cParallel, };
 	unsigned char _original[] = {0, 1, 2, 3, 4, 5, 6, 7, };

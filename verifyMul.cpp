@@ -4,8 +4,10 @@
 #ifdef _MSC_VER
 #include <cstdlib>
 #define alignedMalloc(size,align)	_aligned_malloc(size,align)
+#define alignedFree(ptr)			_aligned_free(ptr)
 #elif defined (__GNUC__)
 #define alignedMalloc(size,align)	memalign(align,size)
+#define alignedFree(ptr)			free(ptr)
 #endif
 #include "floatMul.h"
 #include "featureSupport.h"
@@ -36,8 +38,8 @@ uint4 uncompressToInt4(half4 halfVector, float4 srcVector)
 bool verifyMultiply()
 {
 	float _originalFloat[] = {1.1f,  1.49f, 1.50f, 1.99f, 1.0000001f, 1.4999999f, 1.5000000f, 1.9999999f, };
-	float* originalFloat = reinterpret_cast<float*>(alignedMalloc(8,ALIGN));
-	unsigned int* converted = reinterpret_cast<unsigned int*>(alignedMalloc(8,ALIGN));
+	float* originalFloat = reinterpret_cast<float*>(alignedMalloc(8*sizeof(float),ALIGN));
+	unsigned int* converted = reinterpret_cast<unsigned int*>(alignedMalloc(8*sizeof(float),ALIGN));
 	for (int i = 0;i < 8;i++)
 	{
 		originalFloat[i] = _originalFloat[i];
@@ -52,7 +54,7 @@ bool verifyMultiply()
 
 	std::cout << originalFloat[0] << '\t' << originalFloat[1] << '\t' << originalFloat[2] << '\t' << originalFloat[3] << std::endl;
 	std::cout << converted[0]     << '\t' << converted[1]     << '\t' << converted[2]     << '\t' << converted[3]     << std::endl;
-	std::cout << originalFloat[0] << '\t' << originalFloat[1] << '\t' << originalFloat[2] << '\t' << originalFloat[3] << std::endl;
+	std::cout << originalFloat[4] << '\t' << originalFloat[5] << '\t' << originalFloat[6] << '\t' << originalFloat[7] << std::endl;
 	std::cout << converted[4]     << '\t' << converted[5]     << '\t' << converted[6]     << '\t' << converted[7]     << std::endl;
 
 	const unsigned char cParallel = 8;
@@ -61,8 +63,8 @@ bool verifyMultiply()
 	uchar8 step     = load_uchar8(_step);
 	uchar8 original = load_uchar8(_original);
 	char before[cParallel], after[cParallel];
-	float* _srcVectorDiv =reinterpret_cast<float*>(alignedMalloc(4,ALIGN));
-	float* _srcVectorMul =reinterpret_cast<float*>(alignedMalloc(4,ALIGN));
+	float* _srcVectorDiv = reinterpret_cast<float*>(alignedMalloc(4*sizeof(float),ALIGN));
+	float* _srcVectorMul = reinterpret_cast<float*>(alignedMalloc(4*sizeof(float),ALIGN));
 	bool passedFlag = true;
 	for (int src = 1;src < 256;src++)
 	{
@@ -103,6 +105,10 @@ bool verifyMultiply()
 			}
 		}
 	}
+	alignedFree(_srcVectorMul);
+	alignedFree(_srcVectorDiv);
+	alignedFree(converted);
+	alignedFree(originalFloat);
 	return passedFlag;
 }
 

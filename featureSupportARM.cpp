@@ -1,5 +1,5 @@
 
-#if defined(__arm__) || defined(_M_ARM)
+#if defined(__arm__) || defined(_M_ARM) || defined(__aarch64__)
 #include "featureSupport.h"
 #include <unistd.h>
 #include <sys/auxv.h>
@@ -25,16 +25,20 @@ unsigned int getAuxv()
 
 bool hasNeonSupport()
 {
-	bool hasSupport = false;
-
+#if defined(__arm__) || defined(_M_ARM)
 	return getAuxv() & HWCAP_ARM_NEON;
+#elif defined(__aarch64__)
+	return true;
+#endif
 }
 
 bool hasF16cSupport()
 {
-	bool hasSupport = false;
-
+#if defined(__arm__) || defined(_M_ARM)
 	return getAuxv() & HWCAP_ARM_HALF;
+#elif defined(__aarch64__)
+	return true;
+#endif
 }
 
 bool checkFeatureSupport()

@@ -1,5 +1,5 @@
 
-#if defined(__arm__) || defined(_M_ARM)
+#if defined(__arm__) || defined(_M_ARM) || defined(__aarch64__)
 #include <arm_neon.h>
 typedef float32x4_t float4;
 typedef float16x4_t half4;

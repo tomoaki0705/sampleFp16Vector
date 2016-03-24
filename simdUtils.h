@@ -11,6 +11,7 @@ inline float4 load_float4_copy(float32_t f) { return vdupq_n_f32(f); }
 inline float4 load_float4(const float* ptr) { return *(float4*)ptr; }
 inline half4 load_half4(const short* ptr)   { return *(float16x4_t*)ptr; }
 inline uchar8 load_uchar8(const unsigned char* ptr) { return vld1_u8(ptr); }
+inline uchar8 load_uchar8_repeat(unsigned char c)   { return vdup_n_u8(c); };
 inline void store_half4(void* ptr, half4 h) { *(half4*)ptr = h; }
 inline void store_uchar8(void* ptr, uchar8 c)   { vst1_u8((unsigned char*)ptr, c); }
 inline void store_uint4(void* ptr, uint4 i) { vst1q_u32((unsigned int*)ptr, i); } 
@@ -34,6 +35,7 @@ typedef __m128i uint4;
 inline float4 load_float4(const float* ptr) { return _mm_load_ps(ptr); }
 inline half4 load_half4(const short* ptr)   { return _mm_loadl_epi64((const half4*)ptr); }
 inline uchar8 load_uchar8(const unsigned char* ptr) { return _mm_loadl_epi64((const uchar8*)ptr); }
+inline uchar8 load_uchar8_repeat(unsigned char c)   { return _mm_set1_epi8(c); };
 inline void store_half4(void* ptr, half4 h) { _mm_storel_epi64((half4*)ptr, h); }
 inline void store_uchar8(void* ptr, uchar8 c)   { _mm_storel_epi64((uchar8*)ptr, c); }
 inline void store_uint4(void* ptr, uint4 i) { _mm_store_si128((uint4*)ptr, i); } 

@@ -58,9 +58,8 @@ bool verifyMultiply()
 	std::cout << converted[4]     << '\t' << converted[5]     << '\t' << converted[6]     << '\t' << converted[7]     << std::endl;
 
 	const unsigned char cParallel = 8;
-	unsigned char _step[]     = {cParallel, cParallel, cParallel, cParallel, cParallel, cParallel, cParallel, cParallel, };
 	unsigned char _original[] = {0, 1, 2, 3, 4, 5, 6, 7, };
-	uchar8 step     = load_uchar8(_step);
+	uchar8 step     = load_uchar8_repeat(cParallel);
 	uchar8 original = load_uchar8(_original);
 	char before[cParallel], after[cParallel];
 	float* _srcVectorDiv = reinterpret_cast<float*>(alignedMalloc(4*sizeof(float),ALIGN));

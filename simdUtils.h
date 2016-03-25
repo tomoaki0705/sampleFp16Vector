@@ -22,7 +22,7 @@ inline uint4 convert_ushort8_hi_uint4(ushort8 s){ return vmovl_u16(vget_high_s16
 inline uchar8 convert_ushort8_uchar8(ushort8 s) { return vmovn_u16(s); }
 inline float4 convert_uint4_float4(uint4 i) { return vcvtq_f32_u32(i); }
 inline float4 convert_half4_float4(half4 h) { return vcvt_f32_f16(h); }
-inline uint4 convert_float4_uint4(float4 f) { return vcvtq_u32_f32(f); }
+inline uint4 convert_float4_uint4(float4 f) { return vcvtq_u32_f32(vaddq_f32(f,vdupq_n_f32(0.5f))); }
 inline ushort8 convert_uint4_ushort8(uint4 a, uint4 b){ return vcombine_u16(vmovn_u16(a), vmovn_u16(b)); }
 inline float4 multiply_float4(float4 a, float4 b)     { return vmulq_f32(a, b); }
 #elif defined(__x86_64__) || defined(_M_X64) || defined(_M_IX86) || defined(i386)

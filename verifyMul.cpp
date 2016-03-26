@@ -62,18 +62,11 @@ bool verifyMultiply()
 	uchar8 step     = load_uchar8_repeat(cParallel);
 	uchar8 original = load_uchar8(_original);
 	char before[cParallel], after[cParallel];
-	float* _srcVectorDiv = reinterpret_cast<float*>(alignedMalloc(4*sizeof(float),ALIGN));
-	float* _srcVectorMul = reinterpret_cast<float*>(alignedMalloc(4*sizeof(float),ALIGN));
 	bool passedFlag = true;
 	for (int src = 1;src < 256;src++)
 	{
-		for (int i = 0;i < 4;i++)
-		{
-			_srcVectorDiv[i] = 1.0f/(float)src;
-			_srcVectorMul[i] = (float)src;
-		}
-		float4 srcVectorDiv = load_float4(_srcVectorDiv);
-		float4 srcVectorMul = load_float4(_srcVectorMul);
+		float4 srcVectorDiv = load_float4_copy(1.0f/(float)src);
+		float4 srcVectorMul = load_float4_copy(     (float)src);
 		uchar8 dst = original;
 		for (int i = 0;i <= 256 - cParallel;i += cParallel)
 		{
@@ -104,8 +97,6 @@ bool verifyMultiply()
 			}
 		}
 	}
-	alignedFree(_srcVectorMul);
-	alignedFree(_srcVectorDiv);
 	alignedFree(converted);
 	alignedFree(originalFloat);
 	return passedFlag;

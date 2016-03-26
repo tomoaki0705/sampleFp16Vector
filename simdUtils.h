@@ -34,6 +34,7 @@ typedef __m128i ushort8;
 typedef __m128i uint4; 
 inline float4 load_float4(const float* ptr) { return _mm_load_ps(ptr); }
 inline half4 load_half4(const short* ptr)   { return _mm_loadl_epi64((const half4*)ptr); }
+inline float4 load_float4_copy(float f)     { return _mm_set1_ps(f); }
 inline uchar8 load_uchar8(const unsigned char* ptr) { return _mm_loadl_epi64((const uchar8*)ptr); }
 inline uchar8 load_uchar8_repeat(unsigned char c)   { return _mm_set1_epi8(c); };
 inline void store_half4(void* ptr, half4 h) { _mm_storel_epi64((half4*)ptr, h); }

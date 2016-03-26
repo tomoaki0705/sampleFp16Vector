@@ -65,8 +65,8 @@ bool verifyMultiply()
 	bool passedFlag = true;
 	for (int src = 1;src < 256;src++)
 	{
-		volatile float4 srcVectorDiv = load_float4_copy(1.0f/(float)src);
-		volatile float4 srcVectorMul = load_float4_copy(     (float)src);
+		float4 srcVectorDiv = load_float4_copy(1.0f/(float)src);
+		float4 srcVectorMul = load_float4_copy(     (float)src);
 		uchar8 dst = original;
 		for (int i = 0;i <= 256 - cParallel;i += cParallel)
 		{

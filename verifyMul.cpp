@@ -50,9 +50,8 @@ bool verifyMultiply()
 	std::cout << converted[4]     << '\t' << converted[5]     << '\t' << converted[6]     << '\t' << converted[7]     << std::endl;
 
 	const unsigned char cParallel = 8;
-	unsigned char _original[] = {0, 1, 2, 3, 4, 5, 6, 7, };
 	uchar8 step     = load_uchar8_repeat(cParallel);
-	uchar8 original = load_uchar8(_original);
+	uchar8 original = set_uchar8(7, 6, 5, 4, 3, 2, 1, 0);
 	char before[cParallel], after[cParallel];
 	bool passedFlag = true;
 	for (int src = 1;src < 256;src++)

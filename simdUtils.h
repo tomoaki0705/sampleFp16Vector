@@ -12,6 +12,8 @@ inline float4 load_float4(const float* ptr) { return *(float4*)ptr; }
 inline half4 load_half4(const short* ptr)   { return *(float16x4_t*)ptr; }
 inline uchar8 load_uchar8(const unsigned char* ptr) { return vld1_u8(ptr); }
 inline uchar8 load_uchar8_repeat(unsigned char c)   { return vdup_n_u8(c); };
+//inline float4 set_float4(float f3, float f2, float f1, float f0) { return vcombine_f32(vcreate_f32(
+inline uchar8 set_uchar8(char c7, char c6, char c5, char c4, char c3, char c2, char c1, char c0) { return  vcreate_u8(((uint64_t)c0) << 56 | ((uint64_t)c1) << 48 | ((uint64_t)c2) << 40 | ((uint64_t)c3) << 32 | ((uint64_t)c4) << 24 | ((uint64_t)c5) << 16 | ((uint64_t)c6) << 8 | c7); };
 inline void store_half4(void* ptr, half4 h) { *(half4*)ptr = h; }
 inline void store_uchar8(void* ptr, uchar8 c)   { vst1_u8((unsigned char*)ptr, c); }
 inline void store_uint4(void* ptr, uint4 i) { vst1q_u32((unsigned int*)ptr, i); } 
@@ -37,6 +39,8 @@ inline half4 load_half4(const short* ptr)   { return _mm_loadl_epi64((const half
 inline float4 load_float4_copy(float f)     { return _mm_set1_ps(f); }
 inline uchar8 load_uchar8(const unsigned char* ptr) { return _mm_loadl_epi64((const uchar8*)ptr); }
 inline uchar8 load_uchar8_repeat(unsigned char c)   { return _mm_set1_epi8(c); };
+inline float4 set_float4(float f3, float f2, float f1, float f0) { return _mm_set_ps(f3, f2, f1, f0); };
+inline uchar8 set_uchar8(char c7, char c6, char c5, char c4, char c3, char c2, char c1, char c0) { return _mm_set_epi8 (0, 0, 0, 0, 0, 0, 0, 0, c7, c6, c5, c4, c3, c2, c1, c0); };
 inline void store_half4(void* ptr, half4 h) { _mm_storel_epi64((half4*)ptr, h); }
 inline void store_uchar8(void* ptr, uchar8 c)   { _mm_storel_epi64((uchar8*)ptr, c); }
 inline void store_uint4(void* ptr, uint4 i) { _mm_store_si128((uint4*)ptr, i); } 

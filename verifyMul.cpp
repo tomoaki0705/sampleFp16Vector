@@ -44,9 +44,9 @@ bool verifyMultiply()
 	store_uint4(&converted[0], dstInt1);
 	store_uint4(&converted[4], dstInt2);
 
-	std::cout << originalFloat[0] << '\t' << originalFloat[1] << '\t' << originalFloat[2] << '\t' << originalFloat[3] << std::endl;
+	std::cout << get_float(srcFloat1, 0) << '\t' << get_float(srcFloat1, 1) << '\t' << get_float(srcFloat1, 2) << '\t' << get_float(srcFloat1, 3) << std::endl;
 	std::cout << converted[0]     << '\t' << converted[1]     << '\t' << converted[2]     << '\t' << converted[3]     << std::endl;
-	std::cout << originalFloat[4] << '\t' << originalFloat[5] << '\t' << originalFloat[6] << '\t' << originalFloat[7] << std::endl;
+	std::cout << get_float(srcFloat2, 0) << '\t' << get_float(srcFloat2, 1) << '\t' << get_float(srcFloat2, 2) << '\t' << get_float(srcFloat2, 3) << std::endl;
 	std::cout << converted[4]     << '\t' << converted[5]     << '\t' << converted[6]     << '\t' << converted[7]     << std::endl;
 
 	const unsigned char cParallel = 8;

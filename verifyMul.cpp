@@ -5,7 +5,6 @@
 #include "featureSupport.h"
 #include "simdUtils.h"
 
-const int ALIGN   = 16; // alignment step for SSE
 const int cWidth  = 256;
 const int cHeight = cWidth;
 const int cSize   = cHeight * cWidth;

@@ -1,3 +1,4 @@
+#include "platformMallocDefines.h"
 #include <malloc.h>
 #ifdef _MSC_VER
 #include <cstdlib>

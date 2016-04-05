@@ -38,9 +38,9 @@ bool verifyMultiply()
 	std::cout << get_float(srcFloat2, 0) << '\t' << get_float(srcFloat2, 1) << '\t' << get_float(srcFloat2, 2) << '\t' << get_float(srcFloat2, 3) << std::endl;
 	std::cout << get_uint(dstInt2, 0)    << '\t' << get_uint(dstInt2, 1)    << '\t' << get_uint(dstInt2, 2)    << '\t' << get_uint(dstInt2, 3)    << std::endl;
 
-	const unsigned char cParallel = 8;
-	uchar8 step     = load_uchar8_repeat(cParallel);
-	uchar8 original = set_uchar8(7, 6, 5, 4, 3, 2, 1, 0);
+	const unsigned int cParallel = 8;
+	uchar8 step     = load_uchar8_repeat((unsigned char)cParallel);
+	uchar8 original = set_uchar8(0, 1, 2, 3, 4, 5, 6, 7);
 	char before[cParallel], after[cParallel];
 	bool passedFlag = true;
 	for (int src = 1;src < 256;src++)

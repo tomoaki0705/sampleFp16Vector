@@ -41,7 +41,6 @@ bool verifyMultiply()
 	const unsigned int cParallel = 8;
 	uchar8 step     = load_uchar8_repeat((unsigned char)cParallel);
 	uchar8 original = set_uchar8(0, 1, 2, 3, 4, 5, 6, 7);
-	char before[cParallel], after[cParallel];
 	bool passedFlag = true;
 	for (int src = 1;src < 256;src++)
 	{
@@ -64,17 +63,17 @@ bool verifyMultiply()
 			uchar8 resultChar8;
 			resultChar8     = convert_ushort8_uchar8(dstShort8);
 
-			store_uchar8((void*)before, dst);			
-			store_uchar8((void*)after,  resultChar8);
-			dst = dst + step;
 			for (int j = 0;j < cParallel;j++)
 			{
-				if (before[j] != after[j])
+				unsigned char before = get_uchar(dst, j);
+				unsigned char after  = get_uchar(resultChar8, j);
+				if (before != after)
 				{
-					std::cerr << "error: src:" << src << " expected:" << (unsigned int)before[j] << " actual:" << (unsigned int)after[j] << std::endl;
+					std::cerr << "error: src:" << src << " expected:" << (unsigned int)before << " actual:" << (unsigned int)after << std::endl;
 					passedFlag = false;
 				}
 			}
+			dst = dst + step;
 		}
 	}
 	return passedFlag;

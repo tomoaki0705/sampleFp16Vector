@@ -16,10 +16,10 @@ inline uchar8 load_uchar8(const unsigned char* ptr) { return vld1_u8(ptr); }
 inline uchar8 load_uchar8_repeat(unsigned char c)   { return vdup_n_u8(c); };
 inline float4 set_float4(float f0, float f1, float f2, float f3) { float32x4_t a = vdupq_n_f32(f0);a = vsetq_lane_f32(f1, a, 1);a = vsetq_lane_f32(f2, a, 2);a = vsetq_lane_f32(f3, a, 3); return a; }
 inline uchar8 set_uchar8(char c0, char c1, char c2, char c3, char c4, char c5, char c6, char c7) { return  vcreate_u8(((uint64_t)c0) << 56 | ((uint64_t)c1) << 48 | ((uint64_t)c2) << 40 | ((uint64_t)c3) << 32 | ((uint64_t)c4) << 24 | ((uint64_t)c5) << 16 | ((uint64_t)c6) << 8 | c7); };
-inline float get_float(float4 f, int i)        { return vgetq_lane_f32(f, i); }
-inline short get_half(half4 h, int i)          { return vget_lane_s16((short4)h, i); }
-inline unsigned int get_uint(uint4 u, int i)   { return vgetq_lane_u32(u, i); }
-inline unsigned char get_uchar(uchar8 c, int i){ return vget_lane_u8(c, i); }
+inline float get_float(float4 f, int i)        { float         a[4] __attribute__ ((aligned(ALIGN))); vst1q_f32(a, f);        return a[i]; }
+inline short get_half (half4  h, int i)        { short         a[4] __attribute__ ((aligned(ALIGN))); vst1_s16(a, (short4)h); return a[i]; }
+inline unsigned int get_uint(uint4 u, int i)   { unsigned int  a[4] __attribute__ ((aligned(ALIGN))); vst1q_u32(a, u);        return a[i]; }
+inline unsigned char get_uchar(uchar8 c, int i){ unsigned char a[8] __attribute__ ((aligned(ALIGN))); vst1_u8(a, c);          return a[i]; }
 inline void store_half4(void* ptr, half4 h) { *(half4*)ptr = h; }
 inline void store_uchar8(void* ptr, uchar8 c)   { vst1_u8((unsigned char*)ptr, c); }
 inline void store_uint4(void* ptr, uint4 i) { vst1q_u32((unsigned int*)ptr, i); } 

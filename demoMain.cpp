@@ -12,6 +12,8 @@
 #include <cuda_runtime.h>
 #endif // HAVE_CUDA
 
+typedef unsigned char uchar;
+
 cv::VideoCapture capture;
 const char dumpFilename[] = "dump.png";
 const char windowName[]  = "demo";
@@ -22,9 +24,9 @@ const char* imagePath[][3] = {
 };
 short *gainCuda = NULL;
 float *gainFloatCuda = NULL;
-unsigned char *gainByteCuda = NULL;
-unsigned char *imageCuda = NULL;
-unsigned char *imageResult = NULL;
+uchar *gainByteCuda = NULL;
+uchar *imageCuda = NULL;
+uchar *imageResult = NULL;
 
 enum precision
 {
@@ -92,22 +94,22 @@ void computeStatistics(double time, char key)
 extern "C" void
 launchCudaProcessHalf(dim3 grid, dim3 block, int sbytes,
 						short *gain,
-						unsigned char *imageInput,
-						unsigned char *imageOutput,
+						uchar *imageInput,
+						uchar *imageOutput,
 						int imgw);
 
 extern "C" void
 launchCudaProcessFloat(dim3 grid, dim3 block, int sbytes,
 						float *gain,
-						unsigned char *imageInput,
-						unsigned char *imageOutput,
+						uchar *imageInput,
+						uchar *imageOutput,
 						int imgw);
 
 extern "C" void
 launchCudaProcessByte(dim3 grid, dim3 block, int sbytes,
-						unsigned char *gain,
-						unsigned char *imageInput,
-						unsigned char *imageOutput,
+						uchar *gain,
+						uchar *imageInput,
+						uchar *imageOutput,
 						int imgw);
 
 double multiplyImageCuda(cv::Mat &image, cv::Mat gain)
@@ -214,11 +216,12 @@ void initArray(cv::Mat &image)
 	unsigned int w = image.cols;
 	unsigned int h = image.rows;
 	unsigned int s = w * h;
-	cudaMalloc((short**)&gainCuda, (s*sizeof(short)));
+	unsigned int c = s * 3;
+	cudaMalloc((short**)&gainCuda,      (s*sizeof(short)));
 	cudaMalloc((float**)&gainFloatCuda, (s*sizeof(float)));
-	cudaMalloc((unsigned char**)&gainByteCuda, (s*sizeof(unsigned char)));
-	cudaMalloc((unsigned char**)&imageCuda, (s*sizeof(unsigned char)*3));
-	cudaMalloc((unsigned char**)&imageResult, (s*sizeof(unsigned char)*3));
+	cudaMalloc((uchar**)&gainByteCuda,  (s*sizeof(uchar)));
+	cudaMalloc((uchar**)&imageCuda,     (c*sizeof(uchar)));
+	cudaMalloc((uchar**)&imageResult,   (c*sizeof(uchar)));
 }
 
 void releaseArray()

@@ -60,8 +60,10 @@ void computeStatistics(double time, char key)
 		{
 			history[i] = 0.0f;
 			square[i] = 0.0f;
-			iHistory = 0;
 		}
+		iHistory = 0;
+		break;
+	default:
 		break;
 	}
 

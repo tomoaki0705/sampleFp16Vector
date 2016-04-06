@@ -7,8 +7,9 @@
 const int cWidth  = 256;
 const int cHeight = cWidth;
 const int cSize   = cHeight * cWidth;
+typedef unsigned char uchar;
 
-bool examineTest(unsigned char *result, unsigned char *result_examine, int cSize)
+bool examineTest(uchar *result, uchar *result_examine, int cSize)
 {
 	bool flag = true;
 	int i = 0;
@@ -33,11 +34,11 @@ int main()
 	{
 		return 1;
 	}
-	unsigned char* image = reinterpret_cast<unsigned char*>(alignedMalloc(cSize,ALIGN));
-	short* gain  = reinterpret_cast<short*>(alignedMalloc(cSize*sizeof(short),ALIGN));
-	float* gainOriginal = reinterpret_cast<float*>(alignedMalloc(cSize*sizeof(float),ALIGN));
-	unsigned char* result = reinterpret_cast<unsigned char*>(alignedMalloc(cSize,ALIGN));
-	unsigned char* result_examine = reinterpret_cast<unsigned char*>(alignedMalloc(cSize,ALIGN));
+	uchar* image          = reinterpret_cast<uchar*>(alignedMalloc(cSize*sizeof(uchar),ALIGN));
+	short* gain           = reinterpret_cast<short*>(alignedMalloc(cSize*sizeof(short),ALIGN));
+	float* gainOriginal   = reinterpret_cast<float*>(alignedMalloc(cSize*sizeof(float),ALIGN));
+	uchar* result         = reinterpret_cast<uchar*>(alignedMalloc(cSize*sizeof(uchar),ALIGN));
+	uchar* result_examine = reinterpret_cast<uchar*>(alignedMalloc(cSize*sizeof(uchar),ALIGN));
 	for (unsigned int i = 0;i < cSize;i++)
 	{
 		gainOriginal[i] = 1.0f;

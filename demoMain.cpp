@@ -116,8 +116,10 @@ double multiplyImageCuda(cv::Mat &image, cv::Mat gain)
 {
 	unsigned int image_width  = image.cols;
 	unsigned int image_height = image.rows;
+	unsigned int imageSizeGray  = image_width * image_height;
+	unsigned int imageSizeColor = imageSizeGray * 3;
 
-	cudaMemcpy(imageCuda, image.data, image_height*image_width*sizeof(char)*3, cudaMemcpyHostToDevice);
+	cudaMemcpy(imageCuda, image.data, imageSizeColor*sizeof(char), cudaMemcpyHostToDevice);
 
 	// calculate grid size
     dim3 block(16, 16, 1);
@@ -128,24 +130,24 @@ double multiplyImageCuda(cv::Mat &image, cv::Mat gain)
 	{
 	case 1:
 		begin = cv::getTickCount();
-		cudaMemcpy(gainByteCuda,  gain.data,  image_height*image_width*sizeof(char),  cudaMemcpyHostToDevice);
+		cudaMemcpy(gainByteCuda,  gain.data,  imageSizeGray*sizeof(char),  cudaMemcpyHostToDevice);
 		end = cv::getTickCount();
 		launchCudaProcessByte(grid, block, 0, gainByteCuda, imageCuda, imageResult, image_width);
 		break;
 	case 2:
 		begin = cv::getTickCount();
-		cudaMemcpy(gainCuda,  gain.data,  image_height*image_width*sizeof(short),  cudaMemcpyHostToDevice);
+		cudaMemcpy(gainCuda,  gain.data,  imageSizeGray*sizeof(short),  cudaMemcpyHostToDevice);
 		end = cv::getTickCount();
 		launchCudaProcessHalf(grid, block, 0, gainCuda, imageCuda, imageResult, image_width);
 		break;
 	case 4:
 		begin = cv::getTickCount();
-		cudaMemcpy(gainFloatCuda,  gain.data,  image_height*image_width*sizeof(float),  cudaMemcpyHostToDevice);
+		cudaMemcpy(gainFloatCuda,  gain.data,  imageSizeGray*sizeof(float),  cudaMemcpyHostToDevice);
 		end = cv::getTickCount();
 		launchCudaProcessFloat(grid, block, 0, gainFloatCuda, imageCuda, imageResult, image_width);
 		break;
 	}
-	cudaMemcpy(image.data, imageResult, image_height*image_width*sizeof(char)*3, cudaMemcpyDeviceToHost);
+	cudaMemcpy(image.data, imageResult, imageSizeColor*sizeof(char), cudaMemcpyDeviceToHost);
 
 	double tickCountElapsed = double(end - begin);
 	return tickCountElapsed/(double)cv::getTickFrequency();

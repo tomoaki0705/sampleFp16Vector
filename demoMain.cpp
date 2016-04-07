@@ -27,6 +27,7 @@ float *gainFloatCuda = NULL;
 uchar *gainByteCuda = NULL;
 uchar *imageCuda = NULL;
 uchar *imageResult = NULL;
+const cv::Size vgaSize = cv::Size(640,480);
 
 enum precision
 {
@@ -260,6 +261,18 @@ bool initCuda(){ return false; }
 int main(int argc, char**argv)
 {
 	capture.open(0);
+	if (capture.isOpened() == false)
+	{
+		std::cerr << "no capture device found" << std::endl;
+		return 1;
+	}
+	capture.set(CV_CAP_PROP_FRAME_WIDTH,  vgaSize.width);
+	capture.set(CV_CAP_PROP_FRAME_HEIGHT, vgaSize.height);
+	if (capture.get(cv::CAP_PROP_FRAME_WIDTH) != (double)vgaSize.width || capture.get(cv::CAP_PROP_FRAME_HEIGHT) != (double)vgaSize.height)
+	{
+		std::cerr << "current device doesn't support " << vgaSize.width << "x" << vgaSize.height << " size" << std::endl;
+		return 2;
+	}
 	cv::Mat image;
 	capture >> image;
 
